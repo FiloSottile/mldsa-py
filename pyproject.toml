@@ -5,7 +5,9 @@ description = "A pure-Python implementation of ML-DSA-44 verification"
 readme = "README.md"
 authors = [{name = "Filippo Valsorda"}]
 requires-python = ">=3.8"
-dependencies = []
+dependencies = [
+    "typing_extensions>=4.0; python_version < '3.11'",
+]
 license = "CC0-1.0 OR 0BSD"
 
 [build-system]
@@ -17,3 +19,9 @@ dev = [
     "ruff>=0.15.5",
     "ty>=0.0.21",
 ]
+
+[tool.ruff]
+line-length = 105
+
+[tool.ruff.lint]
+ignore = ["E741"]
