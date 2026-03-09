@@ -16,6 +16,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "pytest>=8",
     "ruff>=0.15.5",
     "ty>=0.0.21",
 ]
@@ -30,6 +31,9 @@ preview = true
 
 [tool.ruff.lint.pydocstyle]
 convention = "pep257"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D", "ANN"]
 
 [tool.ty.rules]
 all = "error"

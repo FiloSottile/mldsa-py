@@ -37,11 +37,11 @@ class Parameters(Enum):
     """ML-DSA parameter sets as defined in FIPS 204."""
 
     ML_DSA_44 = _Parameters(name="ML-DSA-44", public_key_size=1312, signature_size=2420,
-        k=4, l=4, η=2, γ1=17, γ2=88, λ=128, τ=39, ω=80)  # fmt: skip
+        k=4, l=4, η=2, γ1=17, γ2=(Q - 1) // 88, λ=128, τ=39, ω=80)  # fmt: skip
     ML_DSA_65 = _Parameters(name="ML-DSA-65", public_key_size=1952, signature_size=3309,
-        k=6, l=5, η=4, γ1=19, γ2=32, λ=192, τ=49, ω=55)  # fmt: skip
+        k=6, l=5, η=4, γ1=19, γ2=(Q - 1) // 32, λ=192, τ=49, ω=55)  # fmt: skip
     ML_DSA_87 = _Parameters(name="ML-DSA-87", public_key_size=2592, signature_size=4627,
-        k=8, l=7, η=2, γ1=19, γ2=32, λ=256, τ=60, ω=75)  # fmt: skip
+        k=8, l=7, η=2, γ1=19, γ2=(Q - 1) // 32, λ=256, τ=60, ω=75)  # fmt: skip
 
     @property
     def public_key_size(self) -> int:
@@ -88,13 +88,13 @@ class VerificationKey:
             raise ValueError(f"expected {self._p.public_key_size} bytes, got {len(pk)}")
         self._enc = pk
         self._tr = public_key_hash(pk)
-        ρ = pk[:32]
-        pk = pk[32:]
+        ρ = bytes(pk[:32])
+        pkv = memoryview(pk[32:])
 
         self._t1: list[NTTPoly] = []  # NTT(t₁ ⋅ 2ᵈ)
         for _ in range(self._p.k):
-            self._t1.append(ntt(Poly([z << 13 for z in unpack(pk[:320], N, 10)])))
-            pk = pk[320:]
+            self._t1.append(ntt(Poly([F(z.v << 13) for z in unpack(bytes(pkv[:320]), N, 10)])))
+            pkv = pkv[320:]
 
         self._A: list[list[NTTPoly]] = [[] for _ in range(self._p.k)]
         for r in range(self._p.k):
@@ -121,27 +121,27 @@ class VerificationKey:
 
         if len(signature) != self._p.signature_size:
             raise ValueError(f"expected {self._p.signature_size} bytes, got {len(signature)}")
-        ch = signature[: self._p.λ // 4]
-        signature = signature[self._p.λ // 4 :]
+        ch = bytes(signature[: self._p.λ // 4])
+        sigv = memoryview(signature[self._p.λ // 4 :])
         z: list[Poly] = []
         for _ in range(self._p.l):
             length = (self._p.γ1 + 1) * N // 8
-            z.append(Poly(unpack_signed(signature[:length], N, self._p.γ1 + 1)))
-            signature = signature[length:]
+            z.append(Poly(unpack_signed(bytes(sigv[:length]), N, self._p.γ1 + 1)))
+            sigv = sigv[length:]
         h: list[list[int]] = [[0] * N for _ in range(self._p.k)]
         idx = 0
         for i in range(self._p.k):
-            limit = signature[self._p.ω + i]
+            limit = sigv[self._p.ω + i]
             if limit < idx or limit > self._p.ω:
                 raise ValueError("invalid signature encoding")
             first = idx
             while idx < limit:
-                if idx > first and signature[idx - 1] >= signature[idx]:
+                if idx > first and sigv[idx - 1] >= sigv[idx]:
                     raise ValueError("invalid signature encoding")
-                h[i][signature[idx]] = 1
+                h[i][sigv[idx]] = 1
                 idx += 1
         for i in range(idx, self._p.ω):
-            if signature[i] != 0:
+            if sigv[i] != 0:
                 raise ValueError("invalid signature encoding")
 
         c = ntt(sample_in_ball(ch, self._p))
@@ -213,9 +213,6 @@ class F:
     def __mul__(self, other: F) -> F:
         return F.reduce(self.v * other.v)
 
-    def __lshift__(self, other: int) -> F:
-        return F(self.v << other)
-
     def infinity_norm(self) -> int:
         return self.v if self.v <= Q // 2 else Q - self.v
 
@@ -286,23 +283,26 @@ class Poly:
         return cls([F(0)] * N)
 
     def __add__(self, other: Self) -> Self:
-        type_must_match(self, other)
+        if type(self) is not type(other):
+            return NotImplemented
         return type(self)([a + b for a, b in zip(self.cs, other.cs)])
 
     def __sub__(self, other: Self) -> Self:
-        type_must_match(self, other)
+        if type(self) is not type(other):
+            return NotImplemented
         return type(self)([a - b for a, b in zip(self.cs, other.cs)])
 
 
 class NTTPoly(Poly):
     def __mul__(self, other: NTTPoly) -> NTTPoly:
-        type_must_match(self, other)
+        if type(self) is not type(other):
+            return NotImplemented
         return NTTPoly([a * b for a, b in zip(self.cs, other.cs)])
 
 
 def ntt(f: Poly) -> NTTPoly:
     m = 0
-    w = f.cs
+    w = list(f.cs)
     for len in [128, 64, 32, 16, 8, 4, 2, 1]:
         for start in range(0, N, 2 * len):
             m += 1
@@ -316,7 +316,7 @@ def ntt(f: Poly) -> NTTPoly:
 
 def inverse_ntt(f: NTTPoly) -> Poly:
     m = 255
-    w = f.cs
+    w = list(f.cs)
     for len in [1, 2, 4, 8, 16, 32, 64, 128]:
         for start in range(0, N, 2 * len):
             zeta = ZETAS[m]
@@ -324,7 +324,7 @@ def inverse_ntt(f: NTTPoly) -> Poly:
             for j in range(start, start + len):
                 t = w[j]
                 w[j] = t + w[j + len]
-                w[j + len] = t - w[j + len]
+                w[j + len] = w[j + len] - t
                 w[j + len] = zeta * w[j + len]
     return Poly([f * F(8347681) for f in w])
 
@@ -333,33 +333,33 @@ def sample_ntt(ρ: bytes, s: int, r: int) -> NTTPoly:
     G = shake_128()
     G.update(ρ)
     G.update(bytes([s, r]))
+    buf = G.digest(894)
 
     a: list[F] = []
-    buf = G.digest(168)
     while len(a) < N:
-        if len(buf) == 0:
-            buf = G.digest(168)
         v = int.from_bytes(buf[:3], "little") & 0x7FFFFF
         buf = buf[3:]
         if v < Q:
             a.append(F(v))
-    return ntt(Poly(a))
+    return NTTPoly(a)
 
 
 def sample_in_ball(rho: bytes, p: _Parameters) -> Poly:
     G = shake_256()
     G.update(rho)
-    s = G.digest(8)
+    buf = G.digest(221)
+    s = buf[:8]
+    j = memoryview(buf)[8:]
 
     c = [F(0)] * N
     for i in range(256 - p.τ, 256):
-        j = G.digest(1)
         while j[0] > i:
-            j = G.digest(1)
+            j = j[1:]
         c[i] = c[j[0]]
         bit_idx = i + p.τ - 256
         bit = (s[bit_idx // 8] >> (bit_idx % 8)) & 1
         c[j[0]] = F(1) if bit == 0 else F(Q - 1)
+        j = j[1:]
 
     return Poly(c)
 
@@ -378,9 +378,4 @@ def use_hint(w: Poly, h: list[int], p: _Parameters) -> list[int]:
     return w1
 
 
-ZETAS = [F(4193792), F(25847), F(5771523), F(7861508), F(237124), F(7602457), F(7504169), F(466468), F(1826347), F(2353451), F(8021166), F(6288512), F(3119733), F(5495562), F(3111497), F(2680103), F(2725464), F(1024112), F(7300517), F(3585928), F(7830929), F(7260833), F(2619752), F(6271868), F(6262231), F(4520680), F(6980856), F(5102745), F(1757237), F(8360995), F(4010497), F(280005), F(2706023), F(95776), F(3077325), F(3530437), F(6718724), F(4788269), F(5842901), F(3915439), F(4519302), F(5336701), F(3574422), F(5512770), F(3539968), F(8079950), F(2348700), F(7841118), F(6681150), F(6736599), F(3505694), F(4558682), F(3507263), F(6239768), F(6779997), F(3699596), F(811944), F(531354), F(954230), F(3881043), F(3900724), F(5823537), F(2071892), F(5582638), F(4450022), F(6851714), F(4702672), F(5339162), F(6927966), F(3475950), F(2176455), F(6795196), F(7122806), F(1939314), F(4296819), F(7380215), F(5190273), F(5223087), F(4747489), F(126922), F(3412210), F(7396998), F(2147896), F(2715295), F(5412772), F(4686924), F(7969390), F(5903370), F(7709315), F(7151892), F(8357436), F(7072248), F(7998430), F(1349076), F(1852771), F(6949987), F(5037034), F(264944), F(508951), F(3097992), F(44288), F(7280319), F(904516), F(3958618), F(4656075), F(8371839), F(1653064), F(5130689), F(2389356), F(8169440), F(759969), F(7063561), F(189548), F(4827145), F(3159746), F(6529015), F(5971092), F(8202977), F(1315589), F(1341330), F(1285669), F(6795489), F(7567685), F(6940675), F(5361315), F(4499357), F(4751448), F(3839961), F(2091667), F(3407706), F(2316500), F(3817976), F(5037939), F(2244091), F(5933984), F(4817955), F(266997), F(2434439), F(7144689), F(3513181), F(4860065), F(4621053), F(7183191), F(5187039), F(900702), F(1859098), F(909542), F(819034), F(495491), F(6767243), F(8337157), F(7857917), F(7725090), F(5257975), F(2031748), F(3207046), F(4823422), F(7855319), F(7611795), F(4784579), F(342297), F(286988), F(5942594), F(4108315), F(3437287), F(5038140), F(1735879), F(203044), F(2842341), F(2691481), F(5790267), F(1265009), F(4055324), F(1247620), F(2486353), F(1595974), F(4613401), F(1250494), F(2635921), F(4832145), F(5386378), F(1869119), F(1903435), F(7329447), F(7047359), F(1237275), F(5062207), F(6950192), F(7929317), F(1312455), F(3306115), F(6417775), F(7100756), F(1917081), F(5834105), F(7005614), F(1500165), F(777191), F(2235880), F(3406031), F(7838005), F(5548557), F(6709241), F(6533464), F(5796124), F(4656147), F(594136), F(4603424), F(6366809), F(2432395), F(2454455), F(8215696), F(1957272), F(3369112), F(185531), F(7173032), F(5196991), F(162844), F(1616392), F(3014001), F(810149), F(1652634), F(4686184), F(6581310), F(5341501), F(3523897), F(3866901), F(269760), F(2213111), F(7404533), F(1717735), F(472078), F(7953734), F(1723600), F(6577327), F(1910376), F(6712985), F(7276084), F(8119771), F(4546524), F(5441381), F(6144432), F(7959518), F(6094090), F(183443), F(7403526), F(1612842), F(4834730), F(7826001), F(3919660), F(8332111), F(7018208), F(3937738), F(1400424), F(7534263), F(1976782)]  # fmt: skip  # noqa: E501
-
-
-def type_must_match(a: object, b: object) -> None:
-    if type(a) is not type(b):
-        raise TypeError(f"expected {type(a).__name__}, got {type(b).__name__}")
+ZETAS = [F(1), F(4808194), F(3765607), F(3761513), F(5178923), F(5496691), F(5234739), F(5178987), F(7778734), F(3542485), F(2682288), F(2129892), F(3764867), F(7375178), F(557458), F(7159240), F(5010068), F(4317364), F(2663378), F(6705802), F(4855975), F(7946292), F(676590), F(7044481), F(5152541), F(1714295), F(2453983), F(1460718), F(7737789), F(4795319), F(2815639), F(2283733), F(3602218), F(3182878), F(2740543), F(4793971), F(5269599), F(2101410), F(3704823), F(1159875), F(394148), F(928749), F(1095468), F(4874037), F(2071829), F(4361428), F(3241972), F(2156050), F(3415069), F(1759347), F(7562881), F(4805951), F(3756790), F(6444618), F(6663429), F(4430364), F(5483103), F(3192354), F(556856), F(3870317), F(2917338), F(1853806), F(3345963), F(1858416), F(3073009), F(1277625), F(5744944), F(3852015), F(4183372), F(5157610), F(5258977), F(8106357), F(2508980), F(2028118), F(1937570), F(4564692), F(2811291), F(5396636), F(7270901), F(4158088), F(1528066), F(482649), F(1148858), F(5418153), F(7814814), F(169688), F(2462444), F(5046034), F(4213992), F(4892034), F(1987814), F(5183169), F(1736313), F(235407), F(5130263), F(3258457), F(5801164), F(1787943), F(5989328), F(6125690), F(3482206), F(4197502), F(7080401), F(6018354), F(7062739), F(2461387), F(3035980), F(621164), F(3901472), F(7153756), F(2925816), F(3374250), F(1356448), F(5604662), F(2683270), F(5601629), F(4912752), F(2312838), F(7727142), F(7921254), F(348812), F(8052569), F(1011223), F(6026202), F(4561790), F(6458164), F(6143691), F(1744507), F(1753), F(6444997), F(5720892), F(6924527), F(2660408), F(6600190), F(8321269), F(2772600), F(1182243), F(87208), F(636927), F(4415111), F(4423672), F(6084020), F(5095502), F(4663471), F(8352605), F(822541), F(1009365), F(5926272), F(6400920), F(1596822), F(4423473), F(4620952), F(6695264), F(4969849), F(2678278), F(4611469), F(4829411), F(635956), F(8129971), F(5925040), F(4234153), F(6607829), F(2192938), F(6653329), F(2387513), F(4768667), F(8111961), F(5199961), F(3747250), F(2296099), F(1239911), F(4541938), F(3195676), F(2642980), F(1254190), F(8368000), F(2998219), F(141835), F(8291116), F(2513018), F(7025525), F(613238), F(7070156), F(6161950), F(7921677), F(6458423), F(4040196), F(4908348), F(2039144), F(6500539), F(7561656), F(6201452), F(6757063), F(2105286), F(6006015), F(6346610), F(586241), F(7200804), F(527981), F(5637006), F(6903432), F(1994046), F(2491325), F(6987258), F(507927), F(7192532), F(7655613), F(6545891), F(5346675), F(8041997), F(2647994), F(3009748), F(5767564), F(4148469), F(749577), F(4357667), F(3980599), F(2569011), F(6764887), F(1723229), F(1665318), F(2028038), F(1163598), F(5011144), F(3994671), F(8368538), F(7009900), F(3020393), F(3363542), F(214880), F(545376), F(7609976), F(3105558), F(7277073), F(508145), F(7826699), F(860144), F(3430436), F(140244), F(6866265), F(6195333), F(3123762), F(2358373), F(6187330), F(5365997), F(6663603), F(2926054), F(7987710), F(8077412), F(3531229), F(4405932), F(4606686), F(1900052), F(7598542), F(1054478), F(7648983)]  # fmt: skip  # noqa: E501
