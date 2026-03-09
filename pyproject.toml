@@ -24,4 +24,12 @@ dev = [
 line-length = 105
 
 [tool.ruff.lint]
-ignore = ["E741"]
+select = ["E", "F", "B", "RUF", "UP", "ANN", "D", "DOC"]
+ignore = ["E741", "RUF002", "RUF003", "DOC201"]
+preview = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+[tool.ty.rules]
+all = "error"
