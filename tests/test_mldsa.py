@@ -1,17 +1,19 @@
 """Tests for the mldsa package, ported from Go crypto/internal/fips140/mldsa."""
 
+from __future__ import annotations
+
 import random
 
 import pytest
 
-from mldsa import Parameters, VerificationKey
+from mldsa import Parameters, VerificationError, VerificationKey
 from mldsa.mldsa import (
+    ZETAS,
     F,
     N,
-    Q,
-    ZETAS,
     NTTPoly,
     Poly,
+    Q,
     _Parameters,
     centered_mod,
     decompose,
@@ -120,9 +122,7 @@ class TestDecompose:
             r1, r0 = decompose(F(x), p)
             # Check reconstruction: x == r1 * 2γ2 + r0 (mod Q).
             reconstructed = (r1 * 2 * p.γ2 + r0) % Q
-            assert reconstructed == x, (
-                f"decompose({x}) = ({r1}, {r0}), reconstructs to {reconstructed}"
-            )
+            assert reconstructed == x, f"decompose({x}) = ({r1}, {r0}), reconstructs to {reconstructed}"
 
     def test_decompose_44(self) -> None:
         self._test_decompose(Parameters.ML_DSA_44.value)
@@ -315,7 +315,7 @@ class TestVerificationKey:
 
     def test_verify_wrong_size_signature(self) -> None:
         vk = VerificationKey(bytes(Parameters.ML_DSA_44.public_key_size))
-        with pytest.raises(ValueError):
+        with pytest.raises(VerificationError):
             vk.verify(b"message", b"bad sig")
 
     def test_verify_context_too_long(self) -> None:

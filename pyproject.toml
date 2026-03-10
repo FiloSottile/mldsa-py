@@ -25,8 +25,8 @@ dev = [
 line-length = 105
 
 [tool.ruff.lint]
-select = ["E", "F", "B", "RUF", "UP", "ANN", "D", "DOC"]
-ignore = ["E741", "RUF002", "RUF003", "DOC201"]
+select = ["E", "F", "I", "N", "W", "B", "RUF", "UP", "ANN", "D", "DOC"]
+ignore = ["E741", "RUF002", "RUF003", "DOC201", "DOC502", "N806"]
 preview = true
 
 [tool.ruff.lint.pydocstyle]

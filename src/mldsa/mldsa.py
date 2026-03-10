@@ -1,3 +1,9 @@
+# mldsa-py by Filippo Valsorda is marked CC0 1.0 Universal. To view a copy of
+# this mark, visit https://creativecommons.org/publicdomain/zero/1.0/
+#
+# Alternatively, use of this source code is governed by the 0BSD license that
+# can be found in the LICENSE file.
+
 """Pure-Python implementation of ML-DSA (FIPS 204) signature verification."""
 
 from __future__ import annotations
@@ -18,7 +24,7 @@ Q = 8380417
 N = 256
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class _Parameters:
     name: str
     public_key_size: int
@@ -115,12 +121,14 @@ class VerificationKey:
 
         Raises:
             VerificationError: If the signature is invalid.
-            ValueError: If the signature size or encoding is invalid.
+            ValueError: If the context is too long (more than 255 bytes).
         """
         μ = message_hash(self._tr, message, context)
 
         if len(signature) != self._p.signature_size:
-            raise ValueError(f"expected {self._p.signature_size} bytes, got {len(signature)}")
+            raise VerificationError(
+                f"invalid signature size: expected {self._p.signature_size} bytes, got {len(signature)}"
+            )
         ch = bytes(signature[: self._p.λ // 4])
         sigv = memoryview(signature[self._p.λ // 4 :])
         z: list[Poly] = []
@@ -133,16 +141,16 @@ class VerificationKey:
         for i in range(self._p.k):
             limit = sigv[self._p.ω + i]
             if limit < idx or limit > self._p.ω:
-                raise ValueError("invalid signature encoding")
+                raise VerificationError("invalid signature encoding")
             first = idx
             while idx < limit:
                 if idx > first and sigv[idx - 1] >= sigv[idx]:
-                    raise ValueError("invalid signature encoding")
+                    raise VerificationError("invalid signature encoding")
                 h[i][sigv[idx]] = 1
                 idx += 1
         for i in range(idx, self._p.ω):
             if sigv[i] != 0:
-                raise ValueError("invalid signature encoding")
+                raise VerificationError("invalid signature encoding")
 
         c = ntt(sample_in_ball(ch, self._p))
 
