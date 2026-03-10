@@ -1,7 +1,5 @@
 # mldsa-py
 
-https://pypi.org/project/mldsa/
-
 ```
 pip install mldsa
 ```

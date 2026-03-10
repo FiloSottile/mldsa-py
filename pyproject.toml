@@ -1,7 +1,7 @@
 [project]
 name = "mldsa"
 version = "0.1.0"
-description = "A pure-Python implementation of ML-DSA-44 verification"
+description = "A pure-Python implementation of ML-DSA verification"
 readme = "README.md"
 authors = [{name = "Filippo Valsorda"}]
 requires-python = ">=3.8"
@@ -9,6 +9,26 @@ dependencies = [
     "typing_extensions>=4.0; python_version < '3.11'",
 ]
 license = "CC0-1.0 OR 0BSD"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Security :: Cryptography",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+[project.urls]
+homepage = "https://github.com/FiloSottile/mldsa-py"
+source = "https://github.com/FiloSottile/mldsa-py"
+issues = "https://github.com/FiloSottile/mldsa-py/issues"
 
 [build-system]
 requires = ["uv_build>=0.9.21,<0.10.0"]
