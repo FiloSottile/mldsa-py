@@ -111,7 +111,7 @@ class TestZetas:
         zeta = 1753
         for k, z in enumerate(ZETAS):
             exp = pow(zeta, self.bit_rev8(k), Q)
-            assert z.v == exp, f"ZETAS[{k}] = {z.v}, expected {exp}"
+            assert z == exp, f"ZETAS[{k}] = {z}, expected {exp}"
 
 
 class TestDecompose:
@@ -166,9 +166,10 @@ class TestNTT:
         a = Poly([F(random.randrange(Q)) for _ in range(N)])
         b = Poly([F(random.randrange(Q)) for _ in range(N)])
         ntt_sum = ntt(a + b)
-        sum_ntt = ntt(a) + ntt(b)
+        sum_ntt = ntt(a)
+        sum_ntt += ntt(b)
         for i in range(N):
-            assert ntt_sum.cs[i].v == sum_ntt.cs[i].v, f"linearity failed at {i}"
+            assert ntt_sum.cs[i] == sum_ntt.cs[i], f"linearity failed at {i}"
 
     def test_ntt_mul_is_polynomial_mul(self) -> None:
         """NTT pointwise multiplication corresponds to polynomial multiplication
@@ -229,19 +230,19 @@ class TestSampleNTT:
         a1 = sample_ntt(rho, 0, 0)
         a2 = sample_ntt(rho, 0, 0)
         for i in range(N):
-            assert a1.cs[i].v == a2.cs[i].v
+            assert a1.cs[i] == a2.cs[i]
 
     def test_different_indices(self) -> None:
         rho = bytes(32)
         a1 = sample_ntt(rho, 0, 0)
         a2 = sample_ntt(rho, 1, 0)
-        assert any(a1.cs[i].v != a2.cs[i].v for i in range(N))
+        assert any(a1.cs[i] != a2.cs[i] for i in range(N))
 
     def test_coefficients_in_range(self) -> None:
         rho = bytes(range(32))
         a = sample_ntt(rho, 3, 2)
         for i in range(N):
-            assert 0 <= a.cs[i].v < Q
+            assert 0 <= a.cs[i] < Q
 
 
 class TestSampleInBall:
@@ -326,23 +327,23 @@ class TestVerificationKey:
 
 class TestPolyTypes:
     def test_poly_add_type_mismatch(self) -> None:
-        p = Poly.zero()
+        p = Poly([F(0) for _ in range(N)])
         n = NTTPoly.zero()
         with pytest.raises(TypeError):
-            p + n
+            p + n  # type: ignore[unsupported-operator]
 
     def test_poly_sub_type_mismatch(self) -> None:
-        p = Poly.zero()
+        p = Poly([F(0) for _ in range(N)])
         n = NTTPoly.zero()
         with pytest.raises(TypeError):
-            p - n
+            p - n  # type: ignore[unsupported-operator]
 
     def test_ntt_poly_mul(self) -> None:
-        a = NTTPoly([F(1)] * N)
-        b = NTTPoly([F(2)] * N)
+        a = NTTPoly([1] * N)
+        b = NTTPoly([2] * N)
         c = a * b
         for i in range(N):
-            assert c.cs[i].v == 2
+            assert c.cs[i] == 2
 
     def test_poly_wrong_length(self) -> None:
         with pytest.raises(ValueError):
