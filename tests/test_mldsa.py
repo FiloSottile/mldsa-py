@@ -62,9 +62,9 @@ class TestFieldArithmetic:
             assert got == exp, f"F.reduce({v}) = {got}, expected {exp}"
 
     def test_field_bounds(self) -> None:
-        with pytest.raises(ValueError):
+        with pytest.raises(AssertionError):
             F(Q)
-        with pytest.raises(ValueError):
+        with pytest.raises(AssertionError):
             F(-1)
 
 
@@ -301,7 +301,7 @@ class TestVerificationKey:
 
     def test_wrong_size_for_parameters(self) -> None:
         with pytest.raises(ValueError):
-            VerificationKey(bytes(1312), parameters=Parameters.ML_DSA_65)
+            VerificationKey(bytes(1952), parameters=Parameters.ML_DSA_44)
 
     def test_auto_detect_parameters(self) -> None:
         for p in Parameters:
@@ -321,7 +321,7 @@ class TestVerificationKey:
 
     def test_verify_context_too_long(self) -> None:
         vk = VerificationKey(bytes(Parameters.ML_DSA_44.public_key_size))
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="context"):
             vk.verify(b"message", bytes(2420), context=bytes(256))
 
 
@@ -346,5 +346,5 @@ class TestPolyTypes:
             assert c.cs[i] == 2
 
     def test_poly_wrong_length(self) -> None:
-        with pytest.raises(ValueError):
+        with pytest.raises(AssertionError):
             Poly([F(0)] * 100)

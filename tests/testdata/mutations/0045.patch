@@ -1,0 +1,15 @@
+sample_ntt swap s and r
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..7e23dbd 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -361,7 +361,7 @@ def inverse_ntt(f: NTTPoly) -> Poly:
+ def sample_ntt(ρ: bytes, s: int, r: int) -> NTTPoly:
+     G = shake_128()
+     G.update(ρ)
+-    G.update(bytes([s, r]))
++    G.update(bytes([r, s]))
+     buf = G.digest(894)
+ 
+     a: list[int] = []

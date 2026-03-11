@@ -1,0 +1,15 @@
+check z norm on first coefficient only
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..b3d6112 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -178,7 +178,7 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+         γ1β = γ1 - β
+ 
+         for v in z:
+-            if any(x.infinity_norm() >= γ1β for x in v.cs):
++            if v.cs[0].infinity_norm() >= γ1β:
+                 raise VerificationError("invalid signature")
+ 
+ 

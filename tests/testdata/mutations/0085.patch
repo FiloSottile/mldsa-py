@@ -1,0 +1,20 @@
+pack big-endian bit order
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..0826fa0 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -266,11 +266,10 @@ def pack(cs: list[int], bit_length: int) -> bytes:
+     acc_len = 0
+     res = bytearray()
+     for c in cs:
+-        acc |= c << acc_len
++        acc = (acc << bit_length) | c
+         acc_len += bit_length
+         while acc_len >= 8:
+-            res.append(acc & 0xFF)
+-            acc >>= 8
++            res.append((acc >> (acc_len - 8)) & 0xFF)
+             acc_len -= 8
+     if acc_len > 0:
+         res.append(acc & 0xFF)

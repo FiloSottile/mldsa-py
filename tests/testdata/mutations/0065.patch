@@ -1,0 +1,15 @@
+commitment hash use shake_128
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..8358fa5 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -165,7 +165,7 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+ 
+         w1 = [use_hint(w[i], h[i], self._p) for i in range(self._p.k)]
+ 
+-        H = shake_256()
++        H = shake_128()
+         H.update(μ)
+         w1_bit_length = ((Q - 1) // (2 * self._p.γ2) - 1).bit_length()
+         for i in range(self._p.k):

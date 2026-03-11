@@ -1,0 +1,14 @@
+commitment hash skip mu binding
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..bf39992 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -166,7 +166,6 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+         w1 = [use_hint(w[i], h[i], self._p) for i in range(self._p.k)]
+ 
+         H = shake_256()
+-        H.update(μ)
+         w1_bit_length = ((Q - 1) // (2 * self._p.γ2) - 1).bit_length()
+         for i in range(self._p.k):
+             H.update(pack(w1[i], w1_bit_length))

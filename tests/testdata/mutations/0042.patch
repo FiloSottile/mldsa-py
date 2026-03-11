@@ -1,0 +1,15 @@
+unpack_signed wrong bias shift
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..4e19988 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -257,7 +257,7 @@ def unpack(buf: bytes, n: int, bit_length: int) -> list[F]:
+ 
+ 
+ def unpack_signed(buf: bytes, n: int, bit_length: int) -> list[F]:
+-    b = F(1 << (bit_length - 1))
++    b = F(1 << bit_length)
+     return [b - x for x in unpack(buf, n, bit_length)]
+ 
+ 

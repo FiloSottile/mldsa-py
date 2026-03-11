@@ -1,0 +1,15 @@
+sample_in_ball use shake_128
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..46c23bd 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -374,7 +374,7 @@ def sample_ntt(ρ: bytes, s: int, r: int) -> NTTPoly:
+ 
+ 
+ def sample_in_ball(rho: bytes, p: _Parameters) -> Poly:
+-    G = shake_256()
++    G = shake_128()
+     G.update(rho)
+     buf = G.digest(221)
+     s = buf[:8]

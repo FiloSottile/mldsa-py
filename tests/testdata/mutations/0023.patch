@@ -1,0 +1,15 @@
+centered_mod boundary shift
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..c03e5e0 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -227,7 +227,7 @@ def infinity_norm(self) -> int:
+ 
+ def centered_mod(v: int, m: int) -> int:
+     r = v % m
+-    if r > m // 2:
++    if r >= m // 2:
+         r -= m
+     return r
+ 

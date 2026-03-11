@@ -1,0 +1,17 @@
+skip signature length check
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..66ad083 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -125,10 +125,6 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+         """
+         μ = message_hash(self._tr, message, context)
+ 
+-        if len(signature) != self._p.signature_size:
+-            raise VerificationError(
+-                f"invalid signature size: expected {self._p.signature_size} bytes, got {len(signature)}"
+-            )
+         ch = bytes(signature[: self._p.λ // 4])
+         sigv = memoryview(signature[self._p.λ // 4 :])
+         z: list[Poly] = []

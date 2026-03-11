@@ -1,0 +1,18 @@
+use_hint swap direction
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..fbb7a22 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -401,9 +401,9 @@ def use_hint(w: Poly, h: list[int], p: _Parameters) -> list[int]:
+         if h[i] == 0:
+             w1.append(r1)
+         elif r0 > 0:
+-            w1.append((r1 + 1) % m)
+-        else:
+             w1.append((r1 - 1) % m)
++        else:
++            w1.append((r1 + 1) % m)
+     return w1
+ 
+ 

@@ -1,0 +1,17 @@
+c_tilde bits vs bytes confusion
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..729e215 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -129,8 +129,8 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+             raise VerificationError(
+                 f"invalid signature size: expected {self._p.signature_size} bytes, got {len(signature)}"
+             )
+-        ch = bytes(signature[: self._p.λ // 4])
+-        sigv = memoryview(signature[self._p.λ // 4 :])
++        ch = bytes(signature[: self._p.λ // 8])
++        sigv = memoryview(signature[self._p.λ // 8 :])
+         z: list[Poly] = []
+         for _ in range(self._p.l):
+             length = (self._p.γ1 + 1) * N // 8

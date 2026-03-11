@@ -1,0 +1,17 @@
+z decode wrong bit length
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..483fb8f 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -133,8 +133,8 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+         sigv = memoryview(signature[self._p.λ // 4 :])
+         z: list[Poly] = []
+         for _ in range(self._p.l):
+-            length = (self._p.γ1 + 1) * N // 8
+-            z.append(Poly(unpack_signed(bytes(sigv[:length]), N, self._p.γ1 + 1)))
++            length = self._p.γ1 * N // 8
++            z.append(Poly(unpack_signed(bytes(sigv[:length]), N, self._p.γ1)))
+             sigv = sigv[length:]
+         h: list[list[int]] = [[0] * N for _ in range(self._p.k)]
+         idx = 0

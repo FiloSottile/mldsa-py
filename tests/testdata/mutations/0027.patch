@@ -1,0 +1,15 @@
+sample_ntt accepts Q value
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..7a19db8 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -368,7 +368,7 @@ def sample_ntt(ρ: bytes, s: int, r: int) -> NTTPoly:
+     while len(a) < N:
+         v = int.from_bytes(buf[:3], "little") & 0x7FFFFF
+         buf = buf[3:]
+-        if v < Q:
++        if v <= Q:
+             a.append(v)
+     return NTTPoly(a)
+ 

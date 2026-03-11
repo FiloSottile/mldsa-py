@@ -1,0 +1,15 @@
+sample_in_ball bit index shift
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..8a5f0b3 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -385,7 +385,7 @@ def sample_in_ball(rho: bytes, p: _Parameters) -> Poly:
+         while j[0] > i:
+             j = j[1:]
+         c[i] = c[j[0]]
+-        bit_idx = i + p.τ - 256
++        bit_idx = i + p.τ - 255
+         bit = (s[bit_idx // 8] >> (bit_idx % 8)) & 1
+         c[j[0]] = F(1) if bit == 0 else F(Q - 1)
+         j = j[1:]

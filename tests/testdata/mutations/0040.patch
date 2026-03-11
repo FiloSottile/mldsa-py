@@ -1,0 +1,15 @@
+verify w add instead of sub
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..6c8c9b6 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -160,7 +160,7 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+             w_hat = NTTPoly.zero()
+             for j in range(self._p.l):
+                 w_hat += z_hat[j] * self._A[i][j]
+-            w_hat -= c * self._t1[i]
++            w_hat += c * self._t1[i]
+             w.append(inverse_ntt(w_hat))
+ 
+         w1 = [use_hint(w[i], h[i], self._p) for i in range(self._p.k)]

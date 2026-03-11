@@ -1,0 +1,15 @@
+use_hint r0 boundary shift
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..1262050 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -400,7 +400,7 @@ def use_hint(w: Poly, h: list[int], p: _Parameters) -> list[int]:
+         r1, r0 = decompose(w.cs[i], p)
+         if h[i] == 0:
+             w1.append(r1)
+-        elif r0 > 0:
++        elif r0 >= 0:
+             w1.append((r1 + 1) % m)
+         else:
+             w1.append((r1 - 1) % m)

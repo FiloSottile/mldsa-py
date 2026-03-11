@@ -1,0 +1,14 @@
+message hash skip context length
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..f0a983c 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -194,7 +194,6 @@ def message_hash(tr: bytes, m: bytes, ctx: bytes) -> bytes:
+     h = shake_256()
+     h.update(tr)
+     h.update(b"\x00")
+-    h.update(bytes([len(ctx)]))
+     h.update(ctx)
+     h.update(m)
+     return h.digest(64)

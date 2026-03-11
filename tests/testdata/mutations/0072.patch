@@ -1,0 +1,15 @@
+sample_ntt wrong endianness
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..312c247 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -366,7 +366,7 @@ def sample_ntt(ρ: bytes, s: int, r: int) -> NTTPoly:
+ 
+     a: list[int] = []
+     while len(a) < N:
+-        v = int.from_bytes(buf[:3], "little") & 0x7FFFFF
++        v = int.from_bytes(buf[:3], "big") & 0x7FFFFF
+         buf = buf[3:]
+         if v < Q:
+             a.append(v)

@@ -1,0 +1,15 @@
+rho extraction shifted by one
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..1a892c6 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -94,7 +94,7 @@ def __init__(self, pk: bytes, /, parameters: Parameters | None = None) -> None:
+             raise ValueError(f"expected {self._p.public_key_size} bytes, got {len(pk)}")
+         self._enc = pk
+         self._tr = public_key_hash(pk)
+-        ρ = bytes(pk[:32])
++        ρ = bytes(pk[1:33])
+         pkv = memoryview(pk[32:])
+ 
+         self._t1: list[NTTPoly] = []  # NTT(t₁ ⋅ 2ᵈ)

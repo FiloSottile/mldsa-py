@@ -1,0 +1,15 @@
+infinity_norm boundary shift
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..ee74dbe 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -222,7 +222,7 @@ def __mul__(self, other: F) -> F:
+         return F.reduce(self.v * other.v)
+ 
+     def infinity_norm(self) -> int:
+-        return self.v if self.v <= Q // 2 else Q - self.v
++        return self.v if self.v < Q // 2 else Q - self.v
+ 
+ 
+ def centered_mod(v: int, m: int) -> int:

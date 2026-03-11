@@ -1,0 +1,15 @@
+z bound sign flip gamma1+beta
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..7fbc824 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -175,7 +175,7 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+ 
+         β = self._p.τ * self._p.η
+         γ1 = 1 << self._p.γ1
+-        γ1β = γ1 - β
++        γ1β = γ1 + β
+ 
+         for v in z:
+             if any(x.infinity_norm() >= γ1β for x in v.cs):

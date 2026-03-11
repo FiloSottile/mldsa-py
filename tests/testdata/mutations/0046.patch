@@ -1,0 +1,15 @@
+inverse NTT wrong scaling constant
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..7a225ad 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -355,7 +355,7 @@ def inverse_ntt(f: NTTPoly) -> Poly:
+                 t = w[j]
+                 w[j] = (t + w[j + len]) % Q
+                 w[j + len] = zeta * (w[j + len] - t) % Q
+-    return Poly([F(v * 8347681 % Q) for v in w])
++    return Poly([F(v * 8347682 % Q) for v in w])
+ 
+ 
+ def sample_ntt(ρ: bytes, s: int, r: int) -> NTTPoly:

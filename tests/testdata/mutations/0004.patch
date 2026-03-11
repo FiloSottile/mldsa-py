@@ -1,0 +1,16 @@
+skip hint unused bytes check
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..eb0de06 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -148,9 +148,6 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+                     raise VerificationError("invalid signature encoding")
+                 h[i][sigv[idx]] = 1
+                 idx += 1
+-        for i in range(idx, self._p.ω):
+-            if sigv[i] != 0:
+-                raise VerificationError("invalid signature encoding")
+ 
+         c = ntt(sample_in_ball(ch, self._p))
+ 

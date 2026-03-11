@@ -1,0 +1,15 @@
+skip public key size match check
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..e8add4a 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -90,8 +90,6 @@ def __init__(self, pk: bytes, /, parameters: Parameters | None = None) -> None:
+             parameters = size_to_params[len(pk)]
+         self._p = parameters.value
+ 
+-        if len(pk) != self._p.public_key_size:
+-            raise ValueError(f"expected {self._p.public_key_size} bytes, got {len(pk)}")
+         self._enc = pk
+         self._tr = public_key_hash(pk)
+         ρ = bytes(pk[:32])

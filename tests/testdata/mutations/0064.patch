@@ -1,0 +1,20 @@
+use_hint ignore all hints
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..afe9984 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -398,12 +398,7 @@ def use_hint(w: Poly, h: list[int], p: _Parameters) -> list[int]:
+     w1: list[int] = []
+     for i in range(N):
+         r1, r0 = decompose(w.cs[i], p)
+-        if h[i] == 0:
+-            w1.append(r1)
+-        elif r0 > 0:
+-            w1.append((r1 + 1) % m)
+-        else:
+-            w1.append((r1 - 1) % m)
++        w1.append(r1)
+     return w1
+ 
+ 

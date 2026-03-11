@@ -1,0 +1,18 @@
+centered_mod always returns zero
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..1399b39 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -226,10 +226,7 @@ def infinity_norm(self) -> int:
+ 
+ 
+ def centered_mod(v: int, m: int) -> int:
+-    r = v % m
+-    if r > m // 2:
+-        r -= m
+-    return r
++    return 0
+ 
+ 
+ def decompose(r: F, p: _Parameters) -> tuple[int, int]:

@@ -1,0 +1,15 @@
+pointwise multiply 32-bit truncation
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..1ef6ed2 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -327,7 +327,7 @@ def __isub__(self, other: Self) -> Self:
+     def __mul__(self, other: NTTPoly) -> NTTPoly:
+         if type(self) is not type(other):
+             return NotImplemented
+-        return NTTPoly([a * b % Q for a, b in zip(self.cs, other.cs)])
++        return NTTPoly([(a * b & 0xFFFFFFFF) % Q for a, b in zip(self.cs, other.cs)])
+ 
+ 
+ def ntt(f: Poly) -> NTTPoly:

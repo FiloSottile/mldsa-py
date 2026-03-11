@@ -1,0 +1,15 @@
+z norm bound off-by-one up
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..6ebea7e 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -178,7 +178,7 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+         γ1β = γ1 - β
+ 
+         for v in z:
+-            if any(x.infinity_norm() >= γ1β for x in v.cs):
++            if any(x.infinity_norm() >= γ1β + 1 for x in v.cs):
+                 raise VerificationError("invalid signature")
+ 
+ 

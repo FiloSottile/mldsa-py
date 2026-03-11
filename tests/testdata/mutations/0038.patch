@@ -1,0 +1,17 @@
+NTT butterfly swap add/sub
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..c740b11 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -339,8 +339,8 @@ def ntt(f: Poly) -> NTTPoly:
+             zeta = ZETAS[m]
+             for j in range(start, start + len):
+                 t = zeta * w[j + len] % Q
+-                w[j + len] = (w[j] - t) % Q
+-                w[j] = (w[j] + t) % Q
++                w[j + len] = (w[j] + t) % Q
++                w[j] = (w[j] - t) % Q
+     return NTTPoly(w)
+ 
+ 

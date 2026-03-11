@@ -1,0 +1,15 @@
+hint limit skip lower bound
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..dfe97b1 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -140,7 +140,7 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+         idx = 0
+         for i in range(self._p.k):
+             limit = sigv[self._p.ω + i]
+-            if limit < idx or limit > self._p.ω:
++            if limit > self._p.ω:
+                 raise VerificationError("invalid signature encoding")
+             first = idx
+             while idx < limit:

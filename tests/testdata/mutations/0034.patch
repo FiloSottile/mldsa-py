@@ -1,0 +1,15 @@
+public key hash length off-by-one
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..55e603d 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -185,7 +185,7 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+ def public_key_hash(pk: bytes) -> bytes:
+     h = shake_256()
+     h.update(pk)
+-    return h.digest(64)
++    return h.digest(63)
+ 
+ 
+ def message_hash(tr: bytes, m: bytes, ctx: bytes) -> bytes:

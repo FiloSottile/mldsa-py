@@ -1,0 +1,15 @@
+t1 shift off-by-one up
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..26f899f 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -99,7 +99,7 @@ def __init__(self, pk: bytes, /, parameters: Parameters | None = None) -> None:
+ 
+         self._t1: list[NTTPoly] = []  # NTT(t₁ ⋅ 2ᵈ)
+         for _ in range(self._p.k):
+-            self._t1.append(ntt(Poly([F(z.v << 13) for z in unpack(bytes(pkv[:320]), N, 10)])))
++            self._t1.append(ntt(Poly([F(z.v << 14) for z in unpack(bytes(pkv[:320]), N, 10)])))
+             pkv = pkv[320:]
+ 
+         self._A: list[list[NTTPoly]] = [[] for _ in range(self._p.k)]

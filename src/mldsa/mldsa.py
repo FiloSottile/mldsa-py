@@ -204,8 +204,7 @@ class F:
     __slots__ = ("v",)
 
     def __init__(self, v: int) -> None:
-        if not (0 <= v < Q):
-            raise ValueError(f"expected 0 <= v < {Q}, got {v}")
+        assert 0 <= v < Q
         self.v = v
 
     @classmethod
@@ -241,8 +240,7 @@ def decompose(r: F, p: _Parameters) -> tuple[int, int]:
 
 
 def unpack(buf: bytes, n: int, bit_length: int) -> list[F]:
-    if n * bit_length != len(buf) * 8:
-        raise ValueError(f"expected {(n * bit_length) / 8} bytes, got {len(buf)}")
+    assert n * bit_length == len(buf) * 8
     res: list[F] = []
     acc = 0
     acc_len = 0
@@ -282,8 +280,7 @@ class Poly:
     cs: list[F]
 
     def __init__(self, cs: list[F]) -> None:
-        if len(cs) != N:
-            raise ValueError(f"expected {N} coefficients, got {len(cs)}")
+        assert len(cs) == N
         self.cs = cs
 
     def __add__(self, other: Self) -> Self:
@@ -302,8 +299,7 @@ class NTTPoly:
     cs: list[int]  # don't use F to avoid function call overhead in hot loops
 
     def __init__(self, cs: list[int]) -> None:
-        if len(cs) != N:
-            raise ValueError(f"expected {N} coefficients, got {len(cs)}")
+        assert len(cs) == N
         self.cs = cs
 
     @classmethod

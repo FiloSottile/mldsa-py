@@ -1,0 +1,15 @@
+NTT multiply 32-bit truncation
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..856f525 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -338,7 +338,7 @@ def ntt(f: Poly) -> NTTPoly:
+             m += 1
+             zeta = ZETAS[m]
+             for j in range(start, start + len):
+-                t = zeta * w[j + len] % Q
++                t = ((zeta * w[j + len]) & 0xFFFFFFFF) % Q
+                 w[j + len] = (w[j] - t) % Q
+                 w[j] = (w[j] + t) % Q
+     return NTTPoly(w)

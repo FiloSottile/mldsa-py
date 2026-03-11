@@ -1,0 +1,14 @@
+message hash skip message
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..78b1512 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -196,7 +196,6 @@ def message_hash(tr: bytes, m: bytes, ctx: bytes) -> bytes:
+     h.update(b"\x00")
+     h.update(bytes([len(ctx)]))
+     h.update(ctx)
+-    h.update(m)
+     return h.digest(64)
+ 
+ 

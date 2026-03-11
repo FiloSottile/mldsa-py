@@ -1,0 +1,15 @@
+unpack_signed flip subtraction
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..195c07a 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -258,7 +258,7 @@ def unpack(buf: bytes, n: int, bit_length: int) -> list[F]:
+ 
+ def unpack_signed(buf: bytes, n: int, bit_length: int) -> list[F]:
+     b = F(1 << (bit_length - 1))
+-    return [b - x for x in unpack(buf, n, bit_length)]
++    return [x - b for x in unpack(buf, n, bit_length)]
+ 
+ 
+ def pack(cs: list[int], bit_length: int) -> bytes:

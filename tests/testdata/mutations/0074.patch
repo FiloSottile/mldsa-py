@@ -1,0 +1,14 @@
+message hash skip tr binding
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..d32039e 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -192,7 +192,6 @@ def message_hash(tr: bytes, m: bytes, ctx: bytes) -> bytes:
+     if len(ctx) > 255:
+         raise ValueError(f"expected context of at most 255 bytes, got {len(ctx)}")
+     h = shake_256()
+-    h.update(tr)
+     h.update(b"\x00")
+     h.update(bytes([len(ctx)]))
+     h.update(ctx)

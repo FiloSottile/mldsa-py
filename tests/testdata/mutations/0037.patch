@@ -1,0 +1,15 @@
+sample_in_ball flip sign bits
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..d312e58 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -387,7 +387,7 @@ def sample_in_ball(rho: bytes, p: _Parameters) -> Poly:
+         c[i] = c[j[0]]
+         bit_idx = i + p.τ - 256
+         bit = (s[bit_idx // 8] >> (bit_idx % 8)) & 1
+-        c[j[0]] = F(1) if bit == 0 else F(Q - 1)
++        c[j[0]] = F(Q - 1) if bit == 0 else F(1)
+         j = j[1:]
+ 
+     return Poly(c)

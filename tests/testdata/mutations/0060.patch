@@ -1,0 +1,15 @@
+decompose r0 adjustment flipped
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..5addd2d 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -235,7 +235,7 @@ def centered_mod(v: int, m: int) -> int:
+ def decompose(r: F, p: _Parameters) -> tuple[int, int]:
+     r0 = centered_mod(r.v, 2 * p.γ2)
+     if r.v - r0 == Q - 1:
+-        return 0, r0 - 1
++        return 0, r0 + 1
+     r1 = (r.v - r0) // (2 * p.γ2)
+     return r1, r0
+ 

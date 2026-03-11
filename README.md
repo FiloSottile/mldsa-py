@@ -44,6 +44,8 @@ To run tests, use
 uv run ruff check
 uv run ty check
 uv run pytest
+go install github.com/FiloSottile/mostly-harmless/muzoo@latest
+muzoo -mutations tests/testdata/mutations test -- uv run pytest -x
 ```
 
 This project uses tests from [Wycheproof](https://github.com/C2SP/wycheproof).

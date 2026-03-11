@@ -1,0 +1,15 @@
+unpack big-endian bit order
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..2d2624f 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -247,7 +247,7 @@ def unpack(buf: bytes, n: int, bit_length: int) -> list[F]:
+     acc = 0
+     acc_len = 0
+     for b in buf:
+-        acc |= b << acc_len
++        acc = (acc << 8) | b
+         acc_len += 8
+         while acc_len >= bit_length:
+             res.append(F(acc & ((1 << bit_length) - 1)))

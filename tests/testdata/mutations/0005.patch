@@ -1,0 +1,15 @@
+skip commitment hash comparison
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..8fc12a5 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -170,8 +170,6 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+         w1_bit_length = ((Q - 1) // (2 * self._p.γ2) - 1).bit_length()
+         for i in range(self._p.k):
+             H.update(pack(w1[i], w1_bit_length))
+-        if H.digest(self._p.λ // 4) != ch:
+-            raise VerificationError("invalid signature")
+ 
+         β = self._p.τ * self._p.η
+         γ1 = 1 << self._p.γ1

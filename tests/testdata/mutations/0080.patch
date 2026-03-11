@@ -1,0 +1,15 @@
+t1 parse stride off-by-one
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..14d59e2 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -100,7 +100,7 @@ def __init__(self, pk: bytes, /, parameters: Parameters | None = None) -> None:
+         self._t1: list[NTTPoly] = []  # NTT(t₁ ⋅ 2ᵈ)
+         for _ in range(self._p.k):
+             self._t1.append(ntt(Poly([F(z.v << 13) for z in unpack(bytes(pkv[:320]), N, 10)])))
+-            pkv = pkv[320:]
++            pkv = pkv[321:]
+ 
+         self._A: list[list[NTTPoly]] = [[] for _ in range(self._p.k)]
+         for r in range(self._p.k):

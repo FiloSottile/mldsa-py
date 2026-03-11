@@ -1,0 +1,15 @@
+inverse NTT butterfly sign flip
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..472bb4a 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -354,7 +354,7 @@ def inverse_ntt(f: NTTPoly) -> Poly:
+             for j in range(start, start + len):
+                 t = w[j]
+                 w[j] = (t + w[j + len]) % Q
+-                w[j + len] = zeta * (w[j + len] - t) % Q
++                w[j + len] = zeta * (t - w[j + len]) % Q
+     return Poly([F(v * 8347681 % Q) for v in w])
+ 
+ 

@@ -1,0 +1,15 @@
+transpose A matrix indices
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..789d9ba 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -159,7 +159,7 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+         for i in range(self._p.k):
+             w_hat = NTTPoly.zero()
+             for j in range(self._p.l):
+-                w_hat += z_hat[j] * self._A[i][j]
++                w_hat += z_hat[j] * self._A[j][i]
+             w_hat -= c * self._t1[i]
+             w.append(inverse_ntt(w_hat))
+ 

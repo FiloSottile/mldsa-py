@@ -1,0 +1,18 @@
+skip use_hint negative r0 branch
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..e542c4a 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -400,10 +400,8 @@ def use_hint(w: Poly, h: list[int], p: _Parameters) -> list[int]:
+         r1, r0 = decompose(w.cs[i], p)
+         if h[i] == 0:
+             w1.append(r1)
+-        elif r0 > 0:
++        else:
+             w1.append((r1 + 1) % m)
+-        else:
+-            w1.append((r1 - 1) % m)
+     return w1
+ 
+ 

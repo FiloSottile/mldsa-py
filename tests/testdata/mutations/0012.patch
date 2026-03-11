@@ -1,0 +1,18 @@
+check z norm on first vector only
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 1284d00..c60c6a8 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -177,9 +177,8 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+         γ1 = 1 << self._p.γ1
+         γ1β = γ1 - β
+ 
+-        for v in z:
+-            if any(x.infinity_norm() >= γ1β for x in v.cs):
+-                raise VerificationError("invalid signature")
++        if any(x.infinity_norm() >= γ1β for x in z[0].cs):
++            raise VerificationError("invalid signature")
+ 
+ 
+ def public_key_hash(pk: bytes) -> bytes:
