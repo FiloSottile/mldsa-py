@@ -1,0 +1,31 @@
+context length encode as two little-endian bytes
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 303796e..a7cefa9 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -7,6 +7,7 @@
+ """Pure-Python implementation of ML-DSA (FIPS 204) signature verification."""
+ 
+ from __future__ import annotations
++from operator import le
+ 
+ import sys
+ from dataclasses import dataclass
+@@ -189,12 +190,13 @@ def public_key_hash(pk: bytes) -> bytes:
+ 
+ 
+ def message_hash(tr: bytes, m: bytes, ctx: bytes) -> bytes:
+-    if len(ctx) > 255:
+-        raise ValueError(f"expected context of at most 255 bytes, got {len(ctx)}")
+     h = shake_256()
+     h.update(tr)
+     h.update(b"\x00")
+-    h.update(bytes([len(ctx)]))
++    if len(ctx) < 256:
++        h.update(bytes([len(ctx)]))
++    else:
++        h.update(bytes([len(ctx) % 256, len(ctx) // 256]))
+     h.update(ctx)
+     h.update(m)
+     return h.digest(64)

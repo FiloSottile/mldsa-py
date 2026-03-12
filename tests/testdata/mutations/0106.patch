@@ -1,0 +1,15 @@
+message hash length off-by-one down
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 5797eb8..39f7694 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -197,7 +197,7 @@ def message_hash(tr: bytes, m: bytes, ctx: bytes) -> bytes:
+     h.update(bytes([len(ctx)]))
+     h.update(ctx)
+     h.update(m)
+-    return h.digest(64)
++    return h.digest(63)
+ 
+ 
+ class F:

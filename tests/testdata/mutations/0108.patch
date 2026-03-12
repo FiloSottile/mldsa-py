@@ -1,0 +1,15 @@
+NTT zeta index off-by-one down
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 5797eb8..21435bf 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -327,7 +327,7 @@ def __mul__(self, other: NTTPoly) -> NTTPoly:
+ 
+ 
+ def ntt(f: Poly) -> NTTPoly:
+-    m = 0
++    m = -1
+     w = [c.v for c in f.cs]
+     for len in [128, 64, 32, 16, 8, 4, 2, 1]:
+         for start in range(0, N, 2 * len):

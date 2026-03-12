@@ -1,0 +1,15 @@
+skip infinity_norm small value branch
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 5797eb8..badba2c 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -221,7 +221,7 @@ def __mul__(self, other: F) -> F:
+         return F.reduce(self.v * other.v)
+ 
+     def infinity_norm(self) -> int:
+-        return self.v if self.v <= Q // 2 else Q - self.v
++        return Q - self.v
+ 
+ 
+ def centered_mod(v: int, m: int) -> int:
