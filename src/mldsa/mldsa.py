@@ -1,8 +1,8 @@
 # mldsa-py by Filippo Valsorda is marked CC0 1.0 Universal. To view a copy of
 # this mark, visit https://creativecommons.org/publicdomain/zero/1.0/
 #
-# Alternatively, use of this source code is governed by the 0BSD license that
-# can be found in the LICENSE file.
+# Alternatively, you may use this source code under the terms of the 0BSD
+# license that can be found in the LICENSE file.
 
 """Pure-Python implementation of ML-DSA (FIPS 204) signature verification."""
 
