@@ -7,7 +7,7 @@ index 1284d00..93c2dfb 100644
 @@ -191,7 +191,7 @@ def public_key_hash(pk: bytes) -> bytes:
  def message_hash(tr: bytes, m: bytes, ctx: bytes) -> bytes:
      if len(ctx) > 255:
-         raise ValueError(f"expected context of at most 255 bytes, got {len(ctx)}")
+         raise InvalidContextError(f"expected context of at most 255 bytes, got {len(ctx)}")
 -    h = shake_256()
 +    h = shake_128()
      h.update(tr)

@@ -9,7 +9,7 @@ index 1284d00..0b6a431 100644
          if parameters is None:
              size_to_params = {p.public_key_size: p for p in Parameters}
 -            if len(pk) not in size_to_params:
--                raise ValueError(f"unexpected public key size {len(pk)}")
+-                raise InvalidPublicKeyError(f"unexpected public key size {len(pk)}")
              parameters = size_to_params[len(pk)]
          self._p = parameters.value
  

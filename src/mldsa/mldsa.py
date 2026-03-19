@@ -68,6 +68,14 @@ class VerificationError(Exception):
     """Raised when signature verification fails."""
 
 
+class InvalidPublicKeyError(ValueError):
+    """Raised when a public key is invalid."""
+
+
+class InvalidContextError(ValueError):
+    """Raised when a context string is invalid."""
+
+
 class VerificationKey:
     """An ML-DSA public key."""
 
@@ -80,18 +88,18 @@ class VerificationKey:
         the length of *pk*.
 
         Raises:
-            ValueError: If the public key size is invalid or doesn't match
+            InvalidPublicKeyError: If the public key size is invalid or doesn't match
                 the specified parameter set.
         """
         if parameters is None:
             size_to_params = {p.public_key_size: p for p in Parameters}
             if len(pk) not in size_to_params:
-                raise ValueError(f"unexpected public key size {len(pk)}")
+                raise InvalidPublicKeyError(f"unexpected public key size {len(pk)}")
             parameters = size_to_params[len(pk)]
         self._p = parameters.value
 
         if len(pk) != self._p.public_key_size:
-            raise ValueError(f"expected {self._p.public_key_size} bytes, got {len(pk)}")
+            raise InvalidPublicKeyError(f"expected {self._p.public_key_size} bytes, got {len(pk)}")
         self._enc = pk
         self._tr = public_key_hash(pk)
         ρ = bytes(pk[:32])
@@ -121,7 +129,7 @@ class VerificationKey:
 
         Raises:
             VerificationError: If the signature is invalid.
-            ValueError: If the context is too long (more than 255 bytes).
+            InvalidContextError: If the context is too long (more than 255 bytes).
         """
         μ = message_hash(self._tr, message, context)
 
@@ -190,7 +198,7 @@ def public_key_hash(pk: bytes) -> bytes:
 
 def message_hash(tr: bytes, m: bytes, ctx: bytes) -> bytes:
     if len(ctx) > 255:
-        raise ValueError(f"expected context of at most 255 bytes, got {len(ctx)}")
+        raise InvalidContextError(f"expected context of at most 255 bytes, got {len(ctx)}")
     h = shake_256()
     h.update(tr)
     h.update(b"\x00")

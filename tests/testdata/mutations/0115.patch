@@ -17,7 +17,7 @@ index 303796e..bd24304 100644
  
  def message_hash(tr: bytes, m: bytes, ctx: bytes) -> bytes:
 -    if len(ctx) > 255:
--        raise ValueError(f"expected context of at most 255 bytes, got {len(ctx)}")
+-        raise InvalidContextError(f"expected context of at most 255 bytes, got {len(ctx)}")
      h = shake_256()
      h.update(tr)
      h.update(b"\x00")

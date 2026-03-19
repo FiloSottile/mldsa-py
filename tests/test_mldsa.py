@@ -6,7 +6,13 @@ import random
 
 import pytest
 
-from mldsa import Parameters, VerificationError, VerificationKey
+from mldsa import (
+    InvalidContextError,
+    InvalidPublicKeyError,
+    Parameters,
+    VerificationError,
+    VerificationKey,
+)
 from mldsa.mldsa import (
     ZETAS,
     F,
@@ -296,11 +302,11 @@ class TestConstants:
 
 class TestVerificationKey:
     def test_wrong_size(self) -> None:
-        with pytest.raises(ValueError):
+        with pytest.raises(InvalidPublicKeyError):
             VerificationKey(b"too short")
 
     def test_wrong_size_for_parameters(self) -> None:
-        with pytest.raises(ValueError):
+        with pytest.raises(InvalidPublicKeyError):
             VerificationKey(bytes(1952), parameters=Parameters.ML_DSA_44)
 
     def test_auto_detect_parameters(self) -> None:
@@ -321,7 +327,7 @@ class TestVerificationKey:
 
     def test_verify_context_too_long(self) -> None:
         vk = VerificationKey(bytes(Parameters.ML_DSA_44.public_key_size))
-        with pytest.raises(ValueError, match="context"):
+        with pytest.raises(InvalidContextError, match="context"):
             vk.verify(b"message", bytes(2420), context=bytes(256))
 
 

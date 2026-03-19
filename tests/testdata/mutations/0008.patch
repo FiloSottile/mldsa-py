@@ -9,7 +9,7 @@ index 1284d00..e8add4a 100644
          self._p = parameters.value
  
 -        if len(pk) != self._p.public_key_size:
--            raise ValueError(f"expected {self._p.public_key_size} bytes, got {len(pk)}")
+-            raise InvalidPublicKeyError(f"expected {self._p.public_key_size} bytes, got {len(pk)}")
          self._enc = pk
          self._tr = public_key_hash(pk)
          ρ = bytes(pk[:32])

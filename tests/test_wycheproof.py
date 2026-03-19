@@ -8,7 +8,13 @@ from pathlib import Path
 
 import pytest
 
-from mldsa import Parameters, VerificationError, VerificationKey
+from mldsa import (
+    InvalidContextError,
+    InvalidPublicKeyError,
+    Parameters,
+    VerificationError,
+    VerificationKey,
+)
 
 TESTDATA = Path(__file__).parent / "testdata"
 
@@ -50,7 +56,7 @@ def test_wycheproof_verify(params, pk_hex, msg, ctx, sig, result, flags):
         vk = VerificationKey(pk, parameters=params)
         vk.verify(msg, sig, context=ctx)
     elif result == "invalid":
-        with pytest.raises((VerificationError, ValueError)):
+        with pytest.raises((VerificationError, InvalidPublicKeyError, InvalidContextError)):
             vk = VerificationKey(pk, parameters=params)
             vk.verify(msg, sig, context=ctx)
     elif result == "acceptable":
@@ -58,5 +64,5 @@ def test_wycheproof_verify(params, pk_hex, msg, ctx, sig, result, flags):
         try:
             vk = VerificationKey(pk, parameters=params)
             vk.verify(msg, sig, context=ctx)
-        except (VerificationError, ValueError):
+        except (VerificationError, InvalidPublicKeyError, InvalidContextError):
             pass

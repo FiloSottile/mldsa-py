@@ -5,7 +5,7 @@ index 1284d00..5581991 100644
 --- a/src/mldsa/mldsa.py
 +++ b/src/mldsa/mldsa.py
 @@ -193,7 +193,7 @@ def message_hash(tr: bytes, m: bytes, ctx: bytes) -> bytes:
-         raise ValueError(f"expected context of at most 255 bytes, got {len(ctx)}")
+         raise InvalidContextError(f"expected context of at most 255 bytes, got {len(ctx)}")
      h = shake_256()
      h.update(tr)
 -    h.update(b"\x00")
