@@ -55,5 +55,8 @@ convention = "pep257"
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["D", "ANN"]
 
+[tool.pytest.ini_options]
+markers = ["slow: marks tests as slow (run last)"]
+
 [tool.ty.rules]
 all = "error"

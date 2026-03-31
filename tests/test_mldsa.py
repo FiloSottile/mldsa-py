@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import random
 
 import pytest
@@ -354,3 +355,59 @@ class TestPolyTypes:
     def test_poly_wrong_length(self) -> None:
         with pytest.raises(AssertionError):
             Poly([F(0)] * 100)
+
+
+def power2round(r: int) -> tuple[int, int]:
+    r1 = (r + (1 << 12) - 1) >> 13
+    r0 = (r - (r1 << 13)) % Q
+    return r1, r0
+
+
+class TestAccumulated:
+    @pytest.mark.slow
+    def test_accumulated(self) -> None:
+        expected = "f930663417278156ab05d940294a77210a809c924d8ab63ec72f4526247602c7"
+        o = hashlib.shake_128()
+
+        p44 = Parameters.ML_DSA_44.value
+        p65 = Parameters.ML_DSA_65.value
+
+        for batch in range(0, Q, N):
+            size = min(N, Q - batch)
+            xs = list(range(batch, batch + size))
+            cs = [F(x) for x in xs]
+            # Pad to N for Poly if this is the last (partial) batch.
+            if size < N:
+                cs_padded = cs + [F(0)] * (N - size)
+            else:
+                cs_padded = cs
+            w = Poly(cs_padded)
+            h0 = [0] * N
+            h1 = [1] * N
+            w1_44_h0 = use_hint(w, h0, p44)
+            w1_44_h1 = use_hint(w, h1, p44)
+            w1_65_h0 = use_hint(w, h0, p65)
+            w1_65_h1 = use_hint(w, h1, p65)
+
+            for i in range(size):
+                x = xs[i]
+                o.update(f"{centered_mod(x, Q)}\n".encode())
+                o.update(f"{F(x).infinity_norm()}\n".encode())
+                hi, lo = power2round(x)
+                o.update(f"{hi}\n".encode())
+                o.update(f"{lo}\n".encode())
+                r1, r0 = decompose(F(x), p44)
+                assert w1_44_h0[i] == r1
+                o.update(f"{r1}\n".encode())
+                o.update(f"{w1_44_h1[i]}\n".encode())
+                o.update(f"{r0}\n".encode())
+                o.update(f"{abs(r0)}\n".encode())
+                r1, r0 = decompose(F(x), p65)
+                assert w1_65_h0[i] == r1
+                o.update(f"{r1}\n".encode())
+                o.update(f"{w1_65_h1[i]}\n".encode())
+                o.update(f"{r0}\n".encode())
+                o.update(f"{abs(r0)}\n".encode())
+
+        got = o.hexdigest(32)
+        assert got == expected, f"got {got}, expected {expected}"
