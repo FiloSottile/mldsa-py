@@ -337,13 +337,13 @@ class TestPolyTypes:
         p = Poly([F(0) for _ in range(N)])
         n = NTTPoly.zero()
         with pytest.raises(TypeError):
-            p + n  # type: ignore[unsupported-operator]
+            p + n  # ty: ignore[unsupported-operator]
 
     def test_poly_sub_type_mismatch(self) -> None:
         p = Poly([F(0) for _ in range(N)])
         n = NTTPoly.zero()
         with pytest.raises(TypeError):
-            p - n  # type: ignore[unsupported-operator]
+            p - n  # ty: ignore[unsupported-operator]
 
     def test_ntt_poly_mul(self) -> None:
         a = NTTPoly([1] * N)

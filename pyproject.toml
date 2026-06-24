@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [{name = "Filippo Valsorda"}]
 requires-python = ">=3.8"
 dependencies = [
-    "typing_extensions>=4.0; python_version < '3.11'",
+    "typing_extensions>=4.4; python_version < '3.12'",
 ]
 license = "CC0-1.0 OR 0BSD"
 classifiers = [

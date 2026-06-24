@@ -18,6 +18,11 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import Self
 
+if sys.version_info >= (3, 12):
+    from typing import override
+else:
+    from typing_extensions import override
+
 __all__ = ["Parameters", "VerificationError", "VerificationKey"]
 
 Q = 8380417
@@ -51,14 +56,15 @@ class Parameters(Enum):
 
     @property
     def public_key_size(self) -> int:
-        """Return the encoded public key size in bytes."""
+        """The encoded public key size in bytes."""
         return self.value.public_key_size
 
     @property
     def signature_size(self) -> int:
-        """Return the signature size in bytes."""
+        """The signature size in bytes."""
         return self.value.signature_size
 
+    @override
     def __str__(self) -> str:
         """Return the human-readable parameter set name, e.g. ``ML-DSA-44``."""
         return self.value.name
@@ -121,7 +127,7 @@ class VerificationKey:
 
     @property
     def parameters(self) -> Parameters:
-        """Return the parameter set of this key."""
+        """The parameter set of this key."""
         return Parameters(self._p)
 
     def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> None:
