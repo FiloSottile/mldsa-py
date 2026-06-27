@@ -1,13 +1,13 @@
 context length wrap at 256
 
 diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
-index 303796e..b2f6488 100644
+index 2cb390c..239886e 100644
 --- a/src/mldsa/mldsa.py
 +++ b/src/mldsa/mldsa.py
-@@ -189,12 +189,10 @@ def public_key_hash(pk: bytes) -> bytes:
+@@ -225,12 +225,10 @@ def public_key_hash(pk: Buffer) -> bytes:
  
- 
- def message_hash(tr: bytes, m: bytes, ctx: bytes) -> bytes:
+ def message_hash(tr: bytes, m: Buffer, ctx: Buffer) -> bytes:
+     ctx = memoryview(ctx)
 -    if len(ctx) > 255:
 -        raise InvalidContextError(f"expected context of at most 255 bytes, got {len(ctx)}")
      h = shake_256()

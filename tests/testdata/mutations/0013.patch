@@ -1,10 +1,10 @@
 check z norm on last vector only
 
 diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
-index 1284d00..0f631b1 100644
+index 2cb390c..6645d4c 100644
 --- a/src/mldsa/mldsa.py
 +++ b/src/mldsa/mldsa.py
-@@ -177,9 +177,8 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+@@ -212,9 +212,8 @@ def verify(self, signature: Buffer, message: Buffer, *, context: Buffer = b"") -
          γ1 = 1 << self._p.γ1
          γ1β = γ1 - β
  
@@ -15,4 +15,4 @@ index 1284d00..0f631b1 100644
 +            raise VerificationError("invalid signature")
  
  
- def public_key_hash(pk: bytes) -> bytes:
+ def public_key_hash(pk: Buffer) -> bytes:

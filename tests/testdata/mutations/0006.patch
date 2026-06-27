@@ -1,10 +1,10 @@
 skip z vector norm bound check
 
 diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
-index 1284d00..9e14c4e 100644
+index 2cb390c..3c9e4a9 100644
 --- a/src/mldsa/mldsa.py
 +++ b/src/mldsa/mldsa.py
-@@ -177,10 +177,6 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+@@ -212,10 +212,6 @@ def verify(self, signature: Buffer, message: Buffer, *, context: Buffer = b"") -
          γ1 = 1 << self._p.γ1
          γ1β = γ1 - β
  
@@ -13,5 +13,5 @@ index 1284d00..9e14c4e 100644
 -                raise VerificationError("invalid signature")
 -
  
- def public_key_hash(pk: bytes) -> bytes:
+ def public_key_hash(pk: Buffer) -> bytes:
      h = shake_256()

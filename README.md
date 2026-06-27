@@ -13,22 +13,22 @@ handled in constant-time in Python.
 ```python
 from mldsa import VerificationKey, VerificationError
 
-vk = VerificationKey(public_key_bytes)
+vk = VerificationKey(verification_key_bytes)
 
 try:
-    vk.verify(message, signature)
+    vk.verify(signature, message)
 except VerificationError:
     print("invalid signature!")
 ```
 
 The parameter set (ML-DSA-44, ML-DSA-65, or ML-DSA-87) is inferred from the
-public key size, or it can be specified explicitly.
+verification key size, or it can be specified explicitly.
 
 ```python
-from mldsa import Parameters, VerificationKey
+from mldsa import ParameterSet, VerificationKey
 
-vk = VerificationKey(public_key_bytes, parameters=Parameters.ML_DSA_87)
-vk.verify(message, signature, context=b"example.com/foo token")
+vk = VerificationKey(verification_key_bytes, parameters=ParameterSet.ML_DSA_87)
+vk.verify(signature, message, context=b"example.com/foo token")
 ```
 
 The non-test code is [a single-file module](https://github.com/FiloSottile/mldsa-py/blob/main/src/mldsa/mldsa.py)

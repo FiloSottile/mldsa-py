@@ -1,15 +1,15 @@
 skip public key size detection
 
 diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
-index 1284d00..0b6a431 100644
+index 2cb390c..55a4664 100644
 --- a/src/mldsa/mldsa.py
 +++ b/src/mldsa/mldsa.py
-@@ -85,8 +85,6 @@ def __init__(self, pk: bytes, /, parameters: Parameters | None = None) -> None:
-         """
+@@ -112,8 +112,6 @@ def __init__(self, pk: Buffer, /, *, parameters: ParameterSet | None = None) ->
+         pk = memoryview(pk)
          if parameters is None:
-             size_to_params = {p.public_key_size: p for p in Parameters}
+             size_to_params = {p.verification_key_size: p for p in ParameterSet}
 -            if len(pk) not in size_to_params:
--                raise InvalidPublicKeyError(f"unexpected public key size {len(pk)}")
+-                raise InvalidVerificationKeyError(f"unexpected verification key size {len(pk)}")
              parameters = size_to_params[len(pk)]
          self._p = parameters.value
  

@@ -1,13 +1,13 @@
 public_key_hash use shake_128
 
 diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
-index 1284d00..44ecaf9 100644
+index 2cb390c..855cde1 100644
 --- a/src/mldsa/mldsa.py
 +++ b/src/mldsa/mldsa.py
-@@ -183,7 +183,7 @@ def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> N
+@@ -218,7 +218,7 @@ def verify(self, signature: Buffer, message: Buffer, *, context: Buffer = b"") -
  
  
- def public_key_hash(pk: bytes) -> bytes:
+ def public_key_hash(pk: Buffer) -> bytes:
 -    h = shake_256()
 +    h = shake_128()
      h.update(pk)

@@ -9,8 +9,8 @@ import pytest
 
 from mldsa import (
     InvalidContextError,
-    InvalidPublicKeyError,
-    Parameters,
+    InvalidVerificationKeyError,
+    ParameterSet,
     VerificationError,
     VerificationKey,
 )
@@ -132,13 +132,13 @@ class TestDecompose:
             assert reconstructed == x, f"decompose({x}) = ({r1}, {r0}), reconstructs to {reconstructed}"
 
     def test_decompose_44(self) -> None:
-        self._test_decompose(Parameters.ML_DSA_44.value)
+        self._test_decompose(ParameterSet.ML_DSA_44.value)
 
     def test_decompose_65(self) -> None:
-        self._test_decompose(Parameters.ML_DSA_65.value)
+        self._test_decompose(ParameterSet.ML_DSA_65.value)
 
     def test_decompose_87(self) -> None:
-        self._test_decompose(Parameters.ML_DSA_87.value)
+        self._test_decompose(ParameterSet.ML_DSA_87.value)
 
 
 class TestUseHint:
@@ -152,10 +152,10 @@ class TestUseHint:
             assert w1[i] == r1, f"use_hint mismatch at index {i}"
 
     def test_use_hint_44(self) -> None:
-        self._test_use_hint_no_hint(Parameters.ML_DSA_44.value)
+        self._test_use_hint_no_hint(ParameterSet.ML_DSA_44.value)
 
     def test_use_hint_65(self) -> None:
-        self._test_use_hint_no_hint(Parameters.ML_DSA_65.value)
+        self._test_use_hint_no_hint(ParameterSet.ML_DSA_65.value)
 
 
 class TestNTT:
@@ -265,32 +265,32 @@ class TestSampleInBall:
                 assert x.v in (1, Q - 1), f"c[{i}] = {x.v}, expected 1 or {Q - 1}"
 
     def test_sample_in_ball_44(self) -> None:
-        self._test_sample_in_ball(Parameters.ML_DSA_44.value)
+        self._test_sample_in_ball(ParameterSet.ML_DSA_44.value)
 
     def test_sample_in_ball_65(self) -> None:
-        self._test_sample_in_ball(Parameters.ML_DSA_65.value)
+        self._test_sample_in_ball(ParameterSet.ML_DSA_65.value)
 
     def test_sample_in_ball_87(self) -> None:
-        self._test_sample_in_ball(Parameters.ML_DSA_87.value)
+        self._test_sample_in_ball(ParameterSet.ML_DSA_87.value)
 
 
 class TestConstants:
     def test_parameter_sizes(self) -> None:
-        assert Parameters.ML_DSA_44.public_key_size == 1312
-        assert Parameters.ML_DSA_65.public_key_size == 1952
-        assert Parameters.ML_DSA_87.public_key_size == 2592
-        assert Parameters.ML_DSA_44.signature_size == 2420
-        assert Parameters.ML_DSA_65.signature_size == 3309
-        assert Parameters.ML_DSA_87.signature_size == 4627
+        assert ParameterSet.ML_DSA_44.verification_key_size == 1312
+        assert ParameterSet.ML_DSA_65.verification_key_size == 1952
+        assert ParameterSet.ML_DSA_87.verification_key_size == 2592
+        assert ParameterSet.ML_DSA_44.signature_size == 2420
+        assert ParameterSet.ML_DSA_65.signature_size == 3309
+        assert ParameterSet.ML_DSA_87.signature_size == 4627
 
     def test_parameter_names(self) -> None:
-        assert str(Parameters.ML_DSA_44) == "ML-DSA-44"
-        assert str(Parameters.ML_DSA_65) == "ML-DSA-65"
-        assert str(Parameters.ML_DSA_87) == "ML-DSA-87"
+        assert str(ParameterSet.ML_DSA_44) == "ML-DSA-44"
+        assert str(ParameterSet.ML_DSA_65) == "ML-DSA-65"
+        assert str(ParameterSet.ML_DSA_87) == "ML-DSA-87"
 
     def test_parameter_enum(self) -> None:
-        for p in Parameters:
-            vk = VerificationKey(bytes(p.public_key_size), parameters=p)
+        for p in ParameterSet:
+            vk = VerificationKey(bytes(p.verification_key_size), parameters=p)
             assert vk.parameters is p
 
     def test_q(self) -> None:
@@ -303,33 +303,33 @@ class TestConstants:
 
 class TestVerificationKey:
     def test_wrong_size(self) -> None:
-        with pytest.raises(InvalidPublicKeyError):
+        with pytest.raises(InvalidVerificationKeyError):
             VerificationKey(b"too short")
 
     def test_wrong_size_for_parameters(self) -> None:
-        with pytest.raises(InvalidPublicKeyError):
-            VerificationKey(bytes(1952), parameters=Parameters.ML_DSA_44)
+        with pytest.raises(InvalidVerificationKeyError):
+            VerificationKey(bytes(1952), parameters=ParameterSet.ML_DSA_44)
 
     def test_auto_detect_parameters(self) -> None:
-        for p in Parameters:
-            vk = VerificationKey(bytes(p.public_key_size))
+        for p in ParameterSet:
+            vk = VerificationKey(bytes(p.verification_key_size))
             assert vk.parameters is p
 
     def test_bytes_roundtrip(self) -> None:
-        for p in Parameters:
-            pk = bytes(p.public_key_size)
+        for p in ParameterSet:
+            pk = bytes(p.verification_key_size)
             vk = VerificationKey(pk)
             assert bytes(vk) == pk
 
     def test_verify_wrong_size_signature(self) -> None:
-        vk = VerificationKey(bytes(Parameters.ML_DSA_44.public_key_size))
+        vk = VerificationKey(bytes(ParameterSet.ML_DSA_44.verification_key_size))
         with pytest.raises(VerificationError):
-            vk.verify(b"message", b"bad sig")
+            vk.verify(b"bad sig", b"message")
 
     def test_verify_context_too_long(self) -> None:
-        vk = VerificationKey(bytes(Parameters.ML_DSA_44.public_key_size))
+        vk = VerificationKey(bytes(ParameterSet.ML_DSA_44.verification_key_size))
         with pytest.raises(InvalidContextError, match="context"):
-            vk.verify(b"message", bytes(2420), context=bytes(256))
+            vk.verify(bytes(2420), b"message", context=bytes(256))
 
 
 class TestPolyTypes:
@@ -369,8 +369,8 @@ class TestAccumulated:
         expected = "f930663417278156ab05d940294a77210a809c924d8ab63ec72f4526247602c7"
         o = hashlib.shake_128()
 
-        p44 = Parameters.ML_DSA_44.value
-        p65 = Parameters.ML_DSA_65.value
+        p44 = ParameterSet.ML_DSA_44.value
+        p65 = ParameterSet.ML_DSA_65.value
 
         for batch in range(0, Q, N):
             size = min(N, Q - batch)

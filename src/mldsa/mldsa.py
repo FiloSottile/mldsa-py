@@ -19,11 +19,18 @@ else:
     from typing_extensions import Self
 
 if sys.version_info >= (3, 12):
+    from collections.abc import Buffer
     from typing import override
 else:
-    from typing_extensions import override
+    from typing_extensions import Buffer, override
 
-__all__ = ["Parameters", "VerificationError", "VerificationKey"]
+__all__ = [
+    "InvalidContextError",
+    "InvalidVerificationKeyError",
+    "ParameterSet",
+    "VerificationError",
+    "VerificationKey",
+]
 
 Q = 8380417
 N = 256
@@ -32,7 +39,7 @@ N = 256
 @dataclass(frozen=True)
 class _Parameters:
     name: str
-    public_key_size: int
+    verification_key_size: int
     signature_size: int
     k: int
     l: int
@@ -44,20 +51,20 @@ class _Parameters:
     ω: int
 
 
-class Parameters(Enum):
+class ParameterSet(Enum):
     """ML-DSA parameter sets as defined in FIPS 204."""
 
-    ML_DSA_44 = _Parameters(name="ML-DSA-44", public_key_size=1312, signature_size=2420,
+    ML_DSA_44 = _Parameters(name="ML-DSA-44", verification_key_size=1312, signature_size=2420,
         k=4, l=4, η=2, γ1=17, γ2=(Q - 1) // 88, λ=128, τ=39, ω=80)  # fmt: skip
-    ML_DSA_65 = _Parameters(name="ML-DSA-65", public_key_size=1952, signature_size=3309,
+    ML_DSA_65 = _Parameters(name="ML-DSA-65", verification_key_size=1952, signature_size=3309,
         k=6, l=5, η=4, γ1=19, γ2=(Q - 1) // 32, λ=192, τ=49, ω=55)  # fmt: skip
-    ML_DSA_87 = _Parameters(name="ML-DSA-87", public_key_size=2592, signature_size=4627,
+    ML_DSA_87 = _Parameters(name="ML-DSA-87", verification_key_size=2592, signature_size=4627,
         k=8, l=7, η=2, γ1=19, γ2=(Q - 1) // 32, λ=256, τ=60, ω=75)  # fmt: skip
 
     @property
-    def public_key_size(self) -> int:
-        """The encoded public key size in bytes."""
-        return self.value.public_key_size
+    def verification_key_size(self) -> int:
+        """The encoded verification key size in bytes."""
+        return self.value.verification_key_size
 
     @property
     def signature_size(self) -> int:
@@ -69,13 +76,18 @@ class Parameters(Enum):
         """Return the human-readable parameter set name, e.g. ``ML-DSA-44``."""
         return self.value.name
 
+    @override
+    def __repr__(self) -> str:
+        """Return a concise representation, e.g. ``<ParameterSet.ML_DSA_44>``."""
+        return f"<{type(self).__name__}.{self.name}>"
+
 
 class VerificationError(Exception):
     """Raised when signature verification fails."""
 
 
-class InvalidPublicKeyError(ValueError):
-    """Raised when a public key is invalid."""
+class InvalidVerificationKeyError(ValueError):
+    """Raised when a verification key is invalid."""
 
 
 class InvalidContextError(ValueError):
@@ -83,30 +95,33 @@ class InvalidContextError(ValueError):
 
 
 class VerificationKey:
-    """An ML-DSA public key."""
+    """An ML-DSA verification key."""
 
     _p: _Parameters
 
-    def __init__(self, pk: bytes, /, parameters: Parameters | None = None) -> None:
-        """Decode an ML-DSA public key.
+    def __init__(self, pk: Buffer, /, *, parameters: ParameterSet | None = None) -> None:
+        """Decode an ML-DSA verification key.
 
         If *parameters* is ``None``, the parameter set is inferred from
         the length of *pk*.
 
         Raises:
-            InvalidPublicKeyError: If the public key size is invalid or doesn't match
-                the specified parameter set.
+            InvalidVerificationKeyError: If the key is the wrong size or doesn't
+                match the specified parameter set.
         """
+        pk = memoryview(pk)
         if parameters is None:
-            size_to_params = {p.public_key_size: p for p in Parameters}
+            size_to_params = {p.verification_key_size: p for p in ParameterSet}
             if len(pk) not in size_to_params:
-                raise InvalidPublicKeyError(f"unexpected public key size {len(pk)}")
+                raise InvalidVerificationKeyError(f"unexpected verification key size {len(pk)}")
             parameters = size_to_params[len(pk)]
         self._p = parameters.value
 
-        if len(pk) != self._p.public_key_size:
-            raise InvalidPublicKeyError(f"expected {self._p.public_key_size} bytes, got {len(pk)}")
-        self._enc = pk
+        if len(pk) != self._p.verification_key_size:
+            raise InvalidVerificationKeyError(
+                f"expected {self._p.verification_key_size} bytes, got {len(pk)}"
+            )
+        self._enc = bytes(pk)
         self._tr = public_key_hash(pk)
         ρ = bytes(pk[:32])
         pkv = memoryview(pk[32:])
@@ -122,21 +137,27 @@ class VerificationKey:
                 self._A[r].append(sample_ntt(ρ, s, r))
 
     def __bytes__(self) -> bytes:
-        """Return the encoded public key."""
+        """Return the encoded verification key."""
         return self._enc
 
-    @property
-    def parameters(self) -> Parameters:
-        """The parameter set of this key."""
-        return Parameters(self._p)
+    @override
+    def __repr__(self) -> str:
+        """Return a concise representation, e.g. ``<VerificationKey ML-DSA-44>``."""
+        return f"<{type(self).__name__} {self._p.name}>"
 
-    def verify(self, message: bytes, signature: bytes, *, context: bytes = b"") -> None:
+    @property
+    def parameters(self) -> ParameterSet:
+        """The parameter set of this key."""
+        return ParameterSet(self._p)
+
+    def verify(self, signature: Buffer, message: Buffer, *, context: Buffer = b"") -> None:
         """Verify a signature over *message*.
 
         Raises:
             VerificationError: If the signature is invalid.
             InvalidContextError: If the context is too long (more than 255 bytes).
         """
+        signature = memoryview(signature)
         μ = message_hash(self._tr, message, context)
 
         if len(signature) != self._p.signature_size:
@@ -196,13 +217,14 @@ class VerificationKey:
                 raise VerificationError("invalid signature")
 
 
-def public_key_hash(pk: bytes) -> bytes:
+def public_key_hash(pk: Buffer) -> bytes:
     h = shake_256()
     h.update(pk)
     return h.digest(64)
 
 
-def message_hash(tr: bytes, m: bytes, ctx: bytes) -> bytes:
+def message_hash(tr: bytes, m: Buffer, ctx: Buffer) -> bytes:
+    ctx = memoryview(ctx)
     if len(ctx) > 255:
         raise InvalidContextError(f"expected context of at most 255 bytes, got {len(ctx)}")
     h = shake_256()

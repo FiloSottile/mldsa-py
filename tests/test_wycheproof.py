@@ -10,8 +10,8 @@ import pytest
 
 from mldsa import (
     InvalidContextError,
-    InvalidPublicKeyError,
-    Parameters,
+    InvalidVerificationKeyError,
+    ParameterSet,
     VerificationError,
     VerificationKey,
 )
@@ -19,9 +19,9 @@ from mldsa import (
 TESTDATA = Path(__file__).parent / "testdata"
 
 PARAM_MAP = {
-    "ML-DSA-44": Parameters.ML_DSA_44,
-    "ML-DSA-65": Parameters.ML_DSA_65,
-    "ML-DSA-87": Parameters.ML_DSA_87,
+    "ML-DSA-44": ParameterSet.ML_DSA_44,
+    "ML-DSA-65": ParameterSet.ML_DSA_65,
+    "ML-DSA-87": ParameterSet.ML_DSA_87,
 }
 
 
@@ -54,15 +54,15 @@ def test_wycheproof_verify(params, pk_hex, msg, ctx, sig, result, flags):
     pk = bytes.fromhex(pk_hex)
     if result == "valid":
         vk = VerificationKey(pk, parameters=params)
-        vk.verify(msg, sig, context=ctx)
+        vk.verify(sig, msg, context=ctx)
     elif result == "invalid":
-        with pytest.raises((VerificationError, InvalidPublicKeyError, InvalidContextError)):
+        with pytest.raises((VerificationError, InvalidVerificationKeyError, InvalidContextError)):
             vk = VerificationKey(pk, parameters=params)
-            vk.verify(msg, sig, context=ctx)
+            vk.verify(sig, msg, context=ctx)
     elif result == "acceptable":
         # Acceptable results may pass or fail; just ensure no crash.
         try:
             vk = VerificationKey(pk, parameters=params)
-            vk.verify(msg, sig, context=ctx)
-        except (VerificationError, InvalidPublicKeyError, InvalidContextError):
+            vk.verify(sig, msg, context=ctx)
+        except (VerificationError, InvalidVerificationKeyError, InvalidContextError):
             pass

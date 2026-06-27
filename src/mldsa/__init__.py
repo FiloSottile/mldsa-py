@@ -2,16 +2,16 @@
 
 from .mldsa import (
     InvalidContextError,
-    InvalidPublicKeyError,
-    Parameters,
+    InvalidVerificationKeyError,
+    ParameterSet,
     VerificationError,
     VerificationKey,
 )
 
 __all__ = [
     "InvalidContextError",
-    "InvalidPublicKeyError",
-    "Parameters",
+    "InvalidVerificationKeyError",
+    "ParameterSet",
     "VerificationError",
     "VerificationKey",
 ]

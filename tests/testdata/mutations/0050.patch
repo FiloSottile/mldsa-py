@@ -1,12 +1,12 @@
 rho extraction truncated
 
 diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
-index 1284d00..3a6c584 100644
+index 2cb390c..e1ece7e 100644
 --- a/src/mldsa/mldsa.py
 +++ b/src/mldsa/mldsa.py
-@@ -94,7 +94,7 @@ def __init__(self, pk: bytes, /, parameters: Parameters | None = None) -> None:
-             raise InvalidPublicKeyError(f"expected {self._p.public_key_size} bytes, got {len(pk)}")
-         self._enc = pk
+@@ -123,7 +123,7 @@ def __init__(self, pk: Buffer, /, *, parameters: ParameterSet | None = None) ->
+             )
+         self._enc = bytes(pk)
          self._tr = public_key_hash(pk)
 -        ρ = bytes(pk[:32])
 +        ρ = bytes(pk[:31])
