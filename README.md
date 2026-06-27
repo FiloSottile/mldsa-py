@@ -31,8 +31,8 @@ vk = VerificationKey(public_key_bytes, parameters=Parameters.ML_DSA_87)
 vk.verify(message, signature, context=b"example.com/foo token")
 ```
 
-The non-test code is [a single-file module](src/mldsa/mldsa.py) of less than 400
-lines, with no dependencies.
+The non-test code is [a single-file module](https://github.com/FiloSottile/mldsa-py/blob/main/src/mldsa/mldsa.py)
+of less than 500 lines, with no dependencies.
 
 It works with Python 3.8 and later.
 
