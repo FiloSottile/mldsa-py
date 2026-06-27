@@ -1,6 +1,6 @@
 """Wycheproof test vectors for ML-DSA signature verification.
 
-Test vectors from https://github.com/C2SP/wycheproof at commit d1b0cb0337202fa113b735b0e119f451af3c542d.
+Test vectors from https://github.com/C2SP/wycheproof at commit ee7b4f7e611928cbe163dc6f5e54527bfd166f34.
 """
 
 import json
