@@ -1,11 +1,11 @@
 skip public key size detection
 
 diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
-index 2cb390c..55a4664 100644
+index 3e9b5e6..c3c6b8e 100644
 --- a/src/mldsa/mldsa.py
 +++ b/src/mldsa/mldsa.py
 @@ -112,8 +112,6 @@ def __init__(self, pk: Buffer, /, *, parameters: ParameterSet | None = None) ->
-         pk = memoryview(pk)
+         pk = memoryview(pk).cast("B")
          if parameters is None:
              size_to_params = {p.verification_key_size: p for p in ParameterSet}
 -            if len(pk) not in size_to_params:

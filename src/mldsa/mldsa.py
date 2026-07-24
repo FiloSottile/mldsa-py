@@ -109,7 +109,7 @@ class VerificationKey:
             InvalidVerificationKeyError: If the key is the wrong size or doesn't
                 match the specified parameter set.
         """
-        pk = memoryview(pk)
+        pk = memoryview(pk).cast("B")
         if parameters is None:
             size_to_params = {p.verification_key_size: p for p in ParameterSet}
             if len(pk) not in size_to_params:
@@ -157,7 +157,7 @@ class VerificationKey:
             VerificationError: If the signature is invalid.
             InvalidContextError: If the context is too long (more than 255 bytes).
         """
-        signature = memoryview(signature)
+        signature = memoryview(signature).cast("B")
         μ = message_hash(self._tr, message, context)
 
         if len(signature) != self._p.signature_size:
@@ -224,7 +224,7 @@ def public_key_hash(pk: Buffer) -> bytes:
 
 
 def message_hash(tr: bytes, m: Buffer, ctx: Buffer) -> bytes:
-    ctx = memoryview(ctx)
+    ctx = memoryview(ctx).cast("B")
     if len(ctx) > 255:
         raise InvalidContextError(f"expected context of at most 255 bytes, got {len(ctx)}")
     h = shake_256()

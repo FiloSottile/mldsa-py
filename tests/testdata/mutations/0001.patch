@@ -1,11 +1,11 @@
 skip signature length check
 
 diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
-index 2cb390c..98c6637 100644
+index 3e9b5e6..e4477c7 100644
 --- a/src/mldsa/mldsa.py
 +++ b/src/mldsa/mldsa.py
 @@ -160,10 +160,6 @@ def verify(self, signature: Buffer, message: Buffer, *, context: Buffer = b"") -
-         signature = memoryview(signature)
+         signature = memoryview(signature).cast("B")
          μ = message_hash(self._tr, message, context)
  
 -        if len(signature) != self._p.signature_size:

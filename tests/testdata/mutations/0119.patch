@@ -1,0 +1,15 @@
+measure the signature size in buffer items rather than bytes
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 3e9b5e6..e1340bd 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -157,7 +157,7 @@ def verify(self, signature: Buffer, message: Buffer, *, context: Buffer = b"") -
+             VerificationError: If the signature is invalid.
+             InvalidContextError: If the context is too long (more than 255 bytes).
+         """
+-        signature = memoryview(signature).cast("B")
++        signature = memoryview(signature)
+         μ = message_hash(self._tr, message, context)
+ 
+         if len(signature) != self._p.signature_size:

@@ -1,11 +1,11 @@
 message_hash use shake_128
 
 diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
-index 2cb390c..2198a1f 100644
+index 3e9b5e6..cbcde3d 100644
 --- a/src/mldsa/mldsa.py
 +++ b/src/mldsa/mldsa.py
 @@ -227,7 +227,7 @@ def message_hash(tr: bytes, m: Buffer, ctx: Buffer) -> bytes:
-     ctx = memoryview(ctx)
+     ctx = memoryview(ctx).cast("B")
      if len(ctx) > 255:
          raise InvalidContextError(f"expected context of at most 255 bytes, got {len(ctx)}")
 -    h = shake_256()

@@ -16,6 +16,8 @@ from mldsa import (
     VerificationKey,
 )
 
+from .test_mldsa import buffer_variants
+
 TESTDATA = Path(__file__).parent / "testdata"
 
 PARAM_MAP = {
@@ -55,6 +57,44 @@ def load_verify_vectors():
                     )
                 )
     return vectors
+
+
+def load_valid_vector():
+    """Return (params, pk, msg, ctx, sig) for a valid vector with a non-empty context.
+
+    Raises:
+        AssertionError: If the test vectors contain no such vector.
+    """
+    for filename in sorted(TESTDATA.glob("mldsa_*_verify_test.json")):
+        data = json.loads(filename.read_text())
+        params = PARAM_MAP[data["algorithm"]]
+        for group in data["testGroups"]:
+            pk = bytes.fromhex(group["publicKey"])
+            for test in group["tests"]:
+                if test["result"] == "valid" and test.get("ctx"):
+                    return (
+                        params,
+                        pk,
+                        bytes.fromhex(test["msg"]),
+                        bytes.fromhex(test["ctx"]),
+                        bytes.fromhex(test["sig"]),
+                    )
+    raise AssertionError("no valid test vector with a context found")
+
+
+def test_verify_accepts_any_buffer_type():
+    """A valid signature verifies whichever Buffer implementation carries each input."""
+    params, pk, msg, ctx, sig = load_valid_vector()
+    vk = VerificationKey(pk, parameters=params)
+    vk.verify(sig, msg, context=ctx)
+    for buf in buffer_variants(pk):
+        VerificationKey(buf, parameters=params).verify(sig, msg, context=ctx)
+    for buf in buffer_variants(sig):
+        vk.verify(buf, msg, context=ctx)
+    for buf in buffer_variants(msg):
+        vk.verify(sig, buf, context=ctx)
+    for buf in buffer_variants(ctx):
+        vk.verify(sig, msg, context=buf)
 
 
 @pytest.mark.parametrize("params,pk_hex,msg,ctx,sig,result,flags", load_verify_vectors())

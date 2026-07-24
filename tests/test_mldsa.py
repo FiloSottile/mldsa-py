@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import random
+from array import array
+from typing import Any
 
 import pytest
 
@@ -25,6 +27,7 @@ from mldsa.mldsa import (
     centered_mod,
     decompose,
     inverse_ntt,
+    message_hash,
     ntt,
     pack,
     sample_in_ball,
@@ -330,6 +333,65 @@ class TestVerificationKey:
         vk = VerificationKey(bytes(ParameterSet.ML_DSA_44.verification_key_size))
         with pytest.raises(InvalidContextError, match="context"):
             vk.verify(bytes(2420), b"message", context=bytes(256))
+
+
+def buffer_variants(b: bytes) -> list[Any]:
+    """Return the same bytes exposed through several Buffer implementations.
+
+    ``array("I")`` holds 4-byte items, so ``len()`` on a memoryview of it is the
+    item count rather than the byte count. Sizes must be measured in bytes.
+    """
+    variants: list[Any] = [b, bytearray(b), memoryview(b), array("B", b)]
+    if len(b) % 4 == 0:
+        a = array("I")
+        a.frombytes(b)
+        variants.append(a)
+    return variants
+
+
+class TestBufferTypes:
+    def test_key_size_measured_in_bytes(self) -> None:
+        pk = bytes(range(256)) * 5 + bytes(32)
+        assert len(pk) == ParameterSet.ML_DSA_44.verification_key_size
+        for buf in buffer_variants(pk):
+            vk = VerificationKey(buf)
+            assert bytes(vk) == pk
+            assert vk.parameters is ParameterSet.ML_DSA_44
+
+    def test_key_wrong_byte_size_in_non_byte_buffer(self) -> None:
+        # 1312 four-byte items is 5248 bytes, not a valid key size.
+        with pytest.raises(InvalidVerificationKeyError, match="5248"):
+            VerificationKey(array("I", [0] * 1312))
+
+    def test_signature_size_measured_in_bytes(self) -> None:
+        vk = VerificationKey(bytes(ParameterSet.ML_DSA_44.verification_key_size))
+        # 2420 four-byte items is 9680 bytes, not a valid signature size.
+        with pytest.raises(VerificationError, match="9680"):
+            vk.verify(array("I", [0] * 2420), b"message")
+
+    def test_signature_buffer_types_agree(self) -> None:
+        vk = VerificationKey(bytes(ParameterSet.ML_DSA_44.verification_key_size))
+        for buf in buffer_variants(bytes(2420)):
+            with pytest.raises(VerificationError, match=r"^invalid signature$"):
+                vk.verify(buf, b"message")
+
+    def test_context_length_measured_in_bytes(self) -> None:
+        # 255 four-byte items is 1020 bytes, over the 255 byte limit.
+        with pytest.raises(InvalidContextError, match="1020"):
+            message_hash(bytes(64), b"message", array("I", [0] * 255))
+
+    def test_context_buffer_types_agree(self) -> None:
+        ctx = bytes(range(64))
+        expected = message_hash(bytes(64), b"message", ctx)
+        for buf in buffer_variants(ctx):
+            assert message_hash(bytes(64), b"message", buf) == expected
+
+    def test_non_contiguous_buffer_rejected(self) -> None:
+        vk = VerificationKey(bytes(ParameterSet.ML_DSA_44.verification_key_size))
+        with pytest.raises(TypeError):
+            vk.verify(memoryview(bytearray(4840))[::2], b"message")
+        with pytest.raises(TypeError):
+            VerificationKey(memoryview(bytearray(2624))[::2])
 
 
 class TestPolyTypes:

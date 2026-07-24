@@ -42,6 +42,7 @@ To run tests, use
 
 ```bash
 uv run ruff check
+uv run ruff format --check
 uv run ty check
 uv run pytest
 go install github.com/FiloSottile/mostly-harmless/muzoo@latest

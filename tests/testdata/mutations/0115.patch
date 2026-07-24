@@ -1,13 +1,13 @@
 context length encode as two big-endian bytes
 
 diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
-index 2cb390c..d510c30 100644
+index 3e9b5e6..f6006c7 100644
 --- a/src/mldsa/mldsa.py
 +++ b/src/mldsa/mldsa.py
 @@ -225,12 +225,13 @@ def public_key_hash(pk: Buffer) -> bytes:
  
  def message_hash(tr: bytes, m: Buffer, ctx: Buffer) -> bytes:
-     ctx = memoryview(ctx)
+     ctx = memoryview(ctx).cast("B")
 -    if len(ctx) > 255:
 -        raise InvalidContextError(f"expected context of at most 255 bytes, got {len(ctx)}")
      h = shake_256()

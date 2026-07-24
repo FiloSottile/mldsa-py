@@ -1,0 +1,15 @@
+measure the verification key size in buffer items rather than bytes
+
+diff --git a/src/mldsa/mldsa.py b/src/mldsa/mldsa.py
+index 3e9b5e6..f17da12 100644
+--- a/src/mldsa/mldsa.py
++++ b/src/mldsa/mldsa.py
+@@ -109,7 +109,7 @@ def __init__(self, pk: Buffer, /, *, parameters: ParameterSet | None = None) ->
+             InvalidVerificationKeyError: If the key is the wrong size or doesn't
+                 match the specified parameter set.
+         """
+-        pk = memoryview(pk).cast("B")
++        pk = memoryview(pk)
+         if parameters is None:
+             size_to_params = {p.verification_key_size: p for p in ParameterSet}
+             if len(pk) not in size_to_params:
