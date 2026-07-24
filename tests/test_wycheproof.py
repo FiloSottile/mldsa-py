@@ -42,10 +42,18 @@ def load_verify_vectors():
                 sig = bytes.fromhex(test["sig"])
                 result = test["result"]
                 flags = test["flags"]
-                vectors.append(pytest.param(
-                    params, pk_hex, msg, ctx, sig, result, flags,
-                    id=f"{algorithm}-{tc_id}-{comment}",
-                ))
+                vectors.append(
+                    pytest.param(
+                        params,
+                        pk_hex,
+                        msg,
+                        ctx,
+                        sig,
+                        result,
+                        flags,
+                        id=f"{algorithm}-{tc_id}-{comment}",
+                    )
+                )
     return vectors
 
 

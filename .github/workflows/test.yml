@@ -37,6 +37,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
       - run: uv run --upgrade ruff check
+      - run: uv run --upgrade ruff format --check
 
   ty:
     runs-on: ubuntu-latest

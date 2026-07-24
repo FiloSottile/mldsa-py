@@ -39,7 +39,7 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "pytest>=8",
-    "ruff>=0.15.5",
+    "ruff>=0.16",
     "ty>=0.0.21",
 ]
 
@@ -48,7 +48,14 @@ line-length = 105
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "B", "RUF", "UP", "ANN", "D", "DOC"]
-ignore = ["E741", "RUF002", "RUF003", "DOC201", "DOC502", "N806"]
+ignore = [
+    "ambiguous-variable-name",
+    "ambiguous-unicode-character-docstring",
+    "ambiguous-unicode-character-comment",
+    "docstring-missing-returns",
+    "docstring-extraneous-exception",
+    "non-lowercase-variable-in-function",
+]
 preview = true
 
 [tool.ruff.lint.pydocstyle]
