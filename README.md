@@ -36,6 +36,8 @@ of less than 500 lines, with no dependencies.
 
 It works with Python 3.8 and later.
 
+<img width="1352" height="696" alt="mldsa-minimap-3col" src="https://github.com/user-attachments/assets/345f5e0f-2f97-478c-9a8d-5d1ad552dbaf" />
+
 ## Development
 
 To run tests, use
