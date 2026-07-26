@@ -12,17 +12,18 @@ import sys
 from dataclasses import dataclass
 from enum import Enum
 from hashlib import shake_128, shake_256
+from typing import TYPE_CHECKING
 
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
-
-if sys.version_info >= (3, 12):
-    from collections.abc import Buffer
+if TYPE_CHECKING:
+    from typing_extensions import Buffer, Self, override
+elif sys.version_info >= (3, 12):
     from typing import override
 else:
-    from typing_extensions import Buffer, override
+    from typing import Any, Callable
+
+    def override(method: Callable[..., Any]) -> Callable[..., Any]:
+        return method
+
 
 __all__ = [
     "InvalidContextError",

@@ -5,9 +5,6 @@ description = "ML-DSA (FIPS 204) post-quantum signature verification (pure Pytho
 readme = "README.md"
 authors = [{name = "Filippo Valsorda"}]
 requires-python = ">=3.8"
-dependencies = [
-    "typing_extensions>=4.6; python_version < '3.12'",
-]
 license = "CC0-1.0 OR 0BSD"
 license-files = ["LICENSE"]
 classifiers = [
@@ -41,6 +38,7 @@ dev = [
     "pytest>=8",
     "ruff>=0.16",
     "ty>=0.0.21",
+    "typing_extensions>=4.6",
 ]
 
 [tool.ruff]
