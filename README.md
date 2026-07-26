@@ -53,6 +53,21 @@ muzoo -mutations tests/testdata/mutations test -- uv run pytest -x
 
 This project uses tests from [Wycheproof](https://github.com/C2SP/wycheproof).
 
+To run benchmarks, use
+
+```bash
+uv run tests/bench_mldsa.py
+```
+
+The output is in the format of Go benchmarks, and matches the sub-benchmarks of
+`BenchmarkVerify` in `crypto/mldsa`, so the two can be compared with
+
+```bash
+go test -run=^$ -bench=BenchmarkVerify -cpu=1 -count=10 crypto/mldsa | tee go.txt
+uv run tests/bench_mldsa.py -count=10 | tee py.txt
+benchstat -ignore=goos,goarch,pkg,cpu go.txt py.txt
+```
+
 ## License
 
 This work is marked CC0 1.0 Universal. To view a copy of this mark, visit
