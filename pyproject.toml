@@ -1,6 +1,6 @@
 [project]
 name = "mldsa"
-version = "1.0.0"
+version = "1.0.1"
 description = "ML-DSA (FIPS 204) post-quantum signature verification (pure Python, no dependencies)"
 readme = "README.md"
 authors = [{name = "Filippo Valsorda"}]
